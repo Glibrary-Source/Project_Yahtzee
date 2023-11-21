@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "1034055576843",
+    "project_id": "project-yahtzee",
+    "storage_bucket": "project-yahtzee.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1034055576843:android:84d7127951590f3da3860e",
+        "android_client_info": {
+          "package_name": "com.twproject.projectyahtzee"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1034055576843-29te19qa142rltcca0n7orfui47ccivc.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.twproject.projectyahtzee",
+            "certificate_hash": "948bd590c5487826528c1f98820e07fe7c27b12f"
+          }
+        },
+        {
+          "client_id": "1034055576843-eudo3qij0u6oaat0av4bn6fsqtjs20k5.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCw7QdlgZHZ77E2ujJ9GCdrUKIKkHZF9Dk"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1034055576843-eudo3qij0u6oaat0av4bn6fsqtjs20k5.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

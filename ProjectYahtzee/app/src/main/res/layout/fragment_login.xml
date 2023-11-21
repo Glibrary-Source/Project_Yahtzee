@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/colorPrimary"
+    tools:context=".view.login.FragmentLogin">
+
+    <LinearLayout
+        android:id="@+id/linear_google_login"
+        android:gravity="center"
+        android:orientation="horizontal"
+        android:background="@drawable/default_btn_background"
+        android:paddingTop="4dp"
+        android:paddingBottom="4dp"
+        android:paddingStart="16dp"
+        android:paddingEnd="16dp"
+        android:layout_marginBottom="48dp"
+        android:layout_gravity="bottom|center"
+        android:layout_width="210dp"
+        android:layout_height="wrap_content">
+
+        <ImageView
+            android:id="@+id/img_icon_google"
+            android:src="@drawable/icon_login_google"
+            android:layout_marginEnd="16dp"
+            android:layout_width="40dp"
+            android:layout_height="40dp"/>
+
+        <TextView
+            android:id="@+id/text_google_login"
+            android:text="google"
+            android:textColor="#FFFFFF"
+            android:fontFamily="@font/pattaya"
+            android:letterSpacing="0.1"
+            android:textSize="32dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+    </LinearLayout>
+</FrameLayout>

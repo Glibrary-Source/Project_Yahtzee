@@ -1,0 +1,10 @@
+<resources>
+    <string name="app_name">ProjectYahtzee</string>
+    <string name="app_store_name">Yahtzee</string>
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="fragment_mypage_menu_nickname">nickname</string>
+    <string name="fragment_mypage_menu_email">email</string>
+    <string name="fragment_mypage_menu_score">score</string>
+    <string name="fragment_mypage_menu_tier">tier</string>
+    <string name="fragment_mypage_menu_change">change</string>
+</resources>

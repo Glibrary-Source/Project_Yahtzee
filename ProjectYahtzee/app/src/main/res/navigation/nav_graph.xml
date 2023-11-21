@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/nav_graph"
+    app:startDestination="@id/fragmentLogin">
+
+    <fragment
+        android:id="@+id/fragmentLogin"
+        android:name="com.twproject.projectyahtzee.view.login.FragmentLogin"
+        android:label="fragment_login"
+        tools:layout="@layout/fragment_login" >
+        <action
+            android:id="@+id/action_fragmentLogin_to_fragmentMenu"
+            app:destination="@id/fragmentMenu"
+            app:enterAnim="@anim/enter_from_right"
+            app:exitAnim="@anim/exit_to_right"
+            app:popUpToInclusive="true"
+            app:popUpTo="@id/fragmentLogin"/>
+    </fragment>
+    <fragment
+        android:id="@+id/fragmentMenu"
+        android:name="com.twproject.projectyahtzee.view.main.FragmentMenu"
+        android:label="fragment_menu"
+        tools:layout="@layout/fragment_menu" >
+        <action
+            android:id="@+id/action_fragmentMenu_to_fragmentCreateRoom"
+            app:destination="@id/fragmentCreateRoom"
+            app:enterAnim="@anim/enter_from_right"
+            app:exitAnim="@anim/exit_to_right"/>
+        <action
+            android:id="@+id/action_fragmentMenu_to_fragmentRoomList"
+            app:destination="@id/fragmentRoomList"
+            app:enterAnim="@anim/enter_from_right"
+            app:exitAnim="@anim/exit_to_right"/>
+        <action
+            android:id="@+id/action_fragmentMenu_to_fragmentMyProfile"
+            app:destination="@id/fragmentMyProfile"
+            app:enterAnim="@anim/enter_from_right"
+            app:exitAnim="@anim/exit_to_right" />
+    </fragment>
+    <fragment
+        android:id="@+id/fragmentCreateRoom"
+        android:name="com.twproject.projectyahtzee.view.main.FragmentCreateRoom"
+        android:label="fragment_create_room"
+        tools:layout="@layout/fragment_create_room" />
+    <fragment
+        android:id="@+id/fragmentMyProfile"
+        android:name="com.twproject.projectyahtzee.view.main.FragmentMyProfile"
+        android:label="fragment_my_profile"
+        tools:layout="@layout/fragment_my_profile" >
+        <action
+            android:id="@+id/action_fragmentMyProfile_to_fragmentLogin"
+            app:destination="@id/fragmentLogin"
+            app:enterAnim="@anim/enter_from_right"
+            app:exitAnim="@anim/exit_to_right"
+            app:popUpToInclusive="true"
+            app:popUpTo="@id/fragmentMenu" />
+    </fragment>
+    <fragment
+        android:id="@+id/fragmentRoomList"
+        android:name="com.twproject.projectyahtzee.view.main.FragmentRoomList"
+        android:label="fragment_create_room_list"
+        tools:layout="@layout/fragment_create_room_list" />
+</navigation>
