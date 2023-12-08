@@ -2,6 +2,8 @@ package com.twproject.projectyahtzee.view.main
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.util.Log
+import com.google.firebase.auth.FirebaseAuth
 import com.twproject.projectyahtzee.databinding.ActivityMainBinding
 
 class MainActivity : AppCompatActivity() {

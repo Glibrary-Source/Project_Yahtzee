@@ -18,6 +18,7 @@
             app:popUpToInclusive="true"
             app:popUpTo="@id/fragmentLogin"/>
     </fragment>
+
     <fragment
         android:id="@+id/fragmentMenu"
         android:name="com.twproject.projectyahtzee.view.main.FragmentMenu"
@@ -27,7 +28,7 @@
             android:id="@+id/action_fragmentMenu_to_fragmentCreateRoom"
             app:destination="@id/fragmentCreateRoom"
             app:enterAnim="@anim/enter_from_right"
-            app:exitAnim="@anim/exit_to_right"/>
+            app:exitAnim="@anim/exit_to_right" />
         <action
             android:id="@+id/action_fragmentMenu_to_fragmentRoomList"
             app:destination="@id/fragmentRoomList"
@@ -43,7 +44,22 @@
         android:id="@+id/fragmentCreateRoom"
         android:name="com.twproject.projectyahtzee.view.main.FragmentCreateRoom"
         android:label="fragment_create_room"
-        tools:layout="@layout/fragment_create_room" />
+        tools:layout="@layout/fragment_create_room" >
+        <action
+            android:id="@+id/action_fragmentCreateRoom_to_fragmentMenu"
+            app:destination="@id/fragmentMenu"
+            app:enterAnim="@anim/enter_from_right"
+            app:exitAnim="@anim/exit_to_right"
+            app:popUpToInclusive="true"
+            app:popUpTo="@id/fragmentMenu" />
+        <action
+            android:id="@+id/action_fragmentCreateRoom_to_fragmentReadyRoom"
+            app:destination="@id/fragmentReadyRoom"
+            app:enterAnim="@anim/enter_from_right"
+            app:exitAnim="@anim/exit_to_right"
+            app:popUpToInclusive="true"
+            app:popUpTo="@id/fragmentCreateRoom"/>
+    </fragment>
     <fragment
         android:id="@+id/fragmentMyProfile"
         android:name="com.twproject.projectyahtzee.view.main.FragmentMyProfile"
@@ -61,5 +77,41 @@
         android:id="@+id/fragmentRoomList"
         android:name="com.twproject.projectyahtzee.view.main.FragmentRoomList"
         android:label="fragment_create_room_list"
-        tools:layout="@layout/fragment_create_room_list" />
+        tools:layout="@layout/fragment_room_list" >
+        <action
+            android:id="@+id/action_fragmentRoomList_to_fragmentReadyRoom"
+            app:destination="@id/fragmentReadyRoom"
+            app:enterAnim="@anim/enter_from_right"
+            app:exitAnim="@anim/exit_to_right"
+            app:popUpToInclusive="true"
+            app:popUpTo="@id/fragmentRoomList"/>
+    </fragment>
+    <fragment
+        android:id="@+id/fragmentReadyRoom"
+        android:name="com.twproject.projectyahtzee.view.main.FragmentReadyRoom"
+        android:label="fragment_ready_room"
+        tools:layout="@layout/fragment_ready_room" >
+        <argument
+            android:name="RoomDocId"
+            app:argType="string" />
+        <action
+            android:id="@+id/action_fragmentReadyRoom_to_fragmentRoomList"
+            app:destination="@id/fragmentRoomList"
+            app:popUpToInclusive="true"
+            app:popUpTo="@id/fragmentReadyRoom"/>
+        <action
+            android:id="@+id/action_fragmentReadyRoom_to_fragmentPlayRoom"
+            app:destination="@id/fragmentPlayRoom"
+            app:popUpToInclusive="true"
+            app:popUpTo="@id/fragmentReadyRoom"/>
+    </fragment>
+    <fragment
+        android:id="@+id/fragmentPlayRoom"
+        android:name="com.twproject.projectyahtzee.view.main.FragmentPlayRoom"
+        android:label="fragment_play_room"
+        tools:layout="@layout/fragment_play_room" >
+        <argument
+            android:name="room_id"
+            app:argType="string" />
+    </fragment>
 </navigation>

@@ -7,7 +7,6 @@ import android.view.View
 class ButtonAnimation {
 
     fun startAnimation(buttonView: View, scale: Float) {
-
         val initialWidth = buttonView.width
         val initialHeight = buttonView.height
 
@@ -66,6 +65,52 @@ class ButtonAnimation {
                 }
 
                 returnWidthAnimator.start()
+                returnHeightAnimator.start()
+            }
+
+            override fun onAnimationCancel(animation: Animator) {}
+
+            override fun onAnimationRepeat(animation: Animator) {}
+        })
+    }
+
+    fun startAnimationCreate(buttonView: View, scale: Float) {
+        val initialHeight = buttonView.height
+
+        val animationDuration = 300L
+
+        val heightAnimator =
+            ValueAnimator.ofInt(buttonView.height, (initialHeight * scale).toInt())
+
+        heightAnimator.duration = animationDuration
+
+        heightAnimator.addUpdateListener { animation ->
+            val newHeight = animation.animatedValue as Int
+            val params = buttonView.layoutParams
+            params.height = newHeight
+            buttonView.layoutParams = params
+        }
+
+        heightAnimator.start()
+
+        heightAnimator.addListener(object : Animator.AnimatorListener {
+            override fun onAnimationStart(animation: Animator) {}
+
+            override fun onAnimationEnd(animation: Animator) {
+
+                val returnHeightAnimator =
+                    ValueAnimator.ofInt(buttonView.height, initialHeight)
+
+                returnHeightAnimator.duration = animationDuration
+
+
+                returnHeightAnimator.addUpdateListener { animation2 ->
+                    val newHeight = animation2.animatedValue as Int
+                    val params = buttonView.layoutParams
+                    params.height = newHeight
+                    buttonView.layoutParams = params
+                }
+
                 returnHeightAnimator.start()
             }
 

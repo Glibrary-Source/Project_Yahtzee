@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/linear_play_room_item"
+    android:orientation="vertical"
+    android:gravity="center"
+    android:background="@drawable/default_profile_bg"
+    android:layout_margin="4dp"
+    android:layout_width="80dp"
+    android:layout_height="80dp">
+
+    <ImageView
+        android:id="@+id/img_play_room_score_board"
+        android:src="@drawable/icon_profile"
+        android:layout_marginTop="4dp"
+        android:layout_width="48dp"
+        android:layout_height="48dp" />
+
+    <TextView
+        android:id="@+id/text_play_room_nickname"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="4dp"
+        tools:text="nickname"
+        android:textColor="@color/white"
+        android:textSize="18dp"
+        android:fontFamily="@font/pattaya" />
+
+</LinearLayout>

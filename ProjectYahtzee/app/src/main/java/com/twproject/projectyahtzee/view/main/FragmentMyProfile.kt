@@ -17,6 +17,7 @@ import com.twproject.projectyahtzee.MyGlobals
 import com.twproject.projectyahtzee.vbutils.ButtonAnimation
 import com.twproject.projectyahtzee.R
 import com.twproject.projectyahtzee.databinding.FragmentMyProfileBinding
+import com.twproject.projectyahtzee.view.main.datamodel.UserProfileData
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.Dispatchers.Main
@@ -84,8 +85,6 @@ class FragmentMyProfile : Fragment() {
             MyGlobals.instance!!.userLogin = 0
         }
 
-
-
         return binding.root
     }
 
@@ -98,12 +97,9 @@ class FragmentMyProfile : Fragment() {
                     if(item == null) {
                         Toast.makeText(mContext, "다시 시도해주세요.", Toast.LENGTH_SHORT).show()
                     } else {
-                        val nickname = item["nickname"].toString()
-                        val email = item["email"].toString()
-                        val score = item["score"].toString()
-                        val tier = item["tier"].toString()
-                        nickNameCounter = item["change_counter"] as Boolean
-                        settingData(nickname, email, score, tier)
+                        val profile = it.toObject(UserProfileData::class.java)!!
+                        nickNameCounter = profile.change_counter
+                        settingData(profile.nickname, profile.email, profile.score.toString(), profile.tier)
                     }
                 }
         }

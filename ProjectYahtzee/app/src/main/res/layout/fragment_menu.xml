@@ -20,12 +20,14 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toBottomOf="parent">
 
-        <FrameLayout
+        <LinearLayout
             android:id="@+id/linear_create_room"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="@drawable/default_btn_background"
             android:padding="8dp"
+            android:elevation="8dp"
+            android:orientation="horizontal"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -35,27 +37,30 @@
                 android:layout_width="48dp"
                 android:layout_height="48dp"
                 android:layout_gravity="start"
-                android:src="@drawable/icon_dice" />
+                android:src="@drawable/icon_dice"
+                tools:ignore="ContentDescription" />
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="8dp"
                 android:fontFamily="@font/pattaya"
-                android:layout_gravity="center_vertical|center"
+                android:layout_gravity="center"
                 android:letterSpacing="0.1"
                 android:text="Create Room"
                 android:textColor="@color/white"
                 android:textSize="32dp" />
-        </FrameLayout>
+        </LinearLayout>
 
-        <FrameLayout
+        <LinearLayout
             android:id="@+id/linear_room_list"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="25dp"
             android:background="@drawable/default_btn_background"
             android:padding="8dp"
+            android:elevation="8dp"
+            android:orientation="horizontal"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/linear_create_room">
@@ -64,27 +69,32 @@
                 android:layout_width="48dp"
                 android:layout_height="48dp"
                 android:layout_marginEnd="8dp"
-                android:src="@drawable/icon_menu" />
+                android:layout_gravity="start"
+                android:src="@drawable/icon_menu"
+                tools:ignore="ContentDescription" />
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="12dp"
                 android:fontFamily="@font/pattaya"
-                android:layout_gravity="center_vertical|center"
+                android:layout_gravity="center"
                 android:letterSpacing="0.1"
                 android:text="Room List"
                 android:textColor="@color/white"
                 android:textSize="32dp" />
-        </FrameLayout>
+        </LinearLayout>
 
-        <FrameLayout
+        <LinearLayout
             android:id="@+id/linear_my_profile"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="25dp"
             android:background="@drawable/default_btn_background"
+            android:layout_marginBottom="8dp"
             android:padding="8dp"
+            android:elevation="8dp"
+            android:orientation="horizontal"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/linear_room_list">
@@ -93,7 +103,9 @@
                 android:layout_width="48dp"
                 android:layout_height="48dp"
                 android:layout_marginEnd="8dp"
-                android:src="@drawable/icon_profile" />
+                android:layout_gravity="start"
+                android:src="@drawable/icon_profile"
+                tools:ignore="ContentDescription" />
 
             <TextView
                 android:layout_width="wrap_content"
@@ -102,9 +114,9 @@
                 android:text="My Profile"
                 android:layout_marginStart="8dp"
                 android:letterSpacing="0.1"
-                android:layout_gravity="center_vertical|center"
+                android:layout_gravity="center"
                 android:textColor="@color/white"
                 android:textSize="32dp" />
-        </FrameLayout>
+        </LinearLayout>
     </LinearLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

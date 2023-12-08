@@ -48,8 +48,7 @@ class FragmentLogin : Fragment() {
                     navController,
                     action
                 )
-            } catch (_: ApiException) {
-            }
+            } catch (_: ApiException) {}
         }
     }
 

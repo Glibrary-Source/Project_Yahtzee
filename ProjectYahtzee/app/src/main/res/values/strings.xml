@@ -7,4 +7,27 @@
     <string name="fragment_mypage_menu_score">score</string>
     <string name="fragment_mypage_menu_tier">tier</string>
     <string name="fragment_mypage_menu_change">change</string>
+    <string name="btn_create_room_en">Create</string>
+    <string name="btn_cancel_room_en">Cancel</string>
+    <string name="edit_room_name_en">write room name</string>
+    <string name="create_title_en">Create Room</string>
+    <string name="create_room_name_hint_en">Room name</string>
+    <string name="create_room_num_hint_en">Room num</string>
+    <string name="room_list_en">Room List</string>
+    <string name="btn_ready_en">Ready</string>
+    <string name="btn_exit_room">Exit</string>
+    <string name="play_board_ones">Ones</string>
+    <string name="play_board_four_of_a_kind">Four of a Kind</string>
+    <string name="play_board_twos">Twos</string>
+    <string name="play_board_full_house">Full House</string>
+    <string name="play_board_threes">Threes</string>
+    <string name="play_board_four">four</string>
+    <string name="play_board_fours">fours</string>
+    <string name="play_board_big_straight">Big Straight</string>
+    <string name="play_board_fives">Fives</string>
+    <string name="play_board_choice">Choice</string>
+    <string name="play_board_sixes">Sixes</string>
+    <string name="play_board_yacht">Yacht</string>
+    <string name="play_board_total_score">Total Score</string>
+    <string name="play_board_little_straight">Little Straight</string>
 </resources>
