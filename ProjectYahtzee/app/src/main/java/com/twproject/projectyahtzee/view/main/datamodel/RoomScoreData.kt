@@ -13,5 +13,6 @@ data class RoomScoreData (
     val big_straight: Int = 0,
     val yacht: Int = 0,
     val choice: Int = 0,
-    val total: Int = 0
+    val total: Int = 0,
+    val nickname: String = ""
 )

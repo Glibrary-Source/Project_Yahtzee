@@ -26,6 +26,7 @@ import com.twproject.projectyahtzee.R
 import com.twproject.projectyahtzee.databinding.FragmentPlayRoomBinding
 import com.twproject.projectyahtzee.vbutils.onThrottleClick
 import com.twproject.projectyahtzee.view.main.adapter.PlayRoomPlayerAdapter
+import com.twproject.projectyahtzee.view.main.adapter.PlayRoomTotalScoreAdapter
 import com.twproject.projectyahtzee.view.main.data.DiceImageControl
 import com.twproject.projectyahtzee.view.main.datamodel.RoomData
 import com.twproject.projectyahtzee.view.main.datamodel.RoomScoreData
@@ -59,6 +60,8 @@ class FragmentPlayRoom : Fragment() {
     private var dice3Clicked = false
     private var dice4Clicked = false
     private var dice5Clicked = false
+
+    private var userNickName = ""
 
     private var diceImage = DiceImageControl().getDiceImage()
     private var firstTurn = true
@@ -183,12 +186,15 @@ class FragmentPlayRoom : Fragment() {
                     } else {
                         val playerDataList = roomData.player_data as Map<String, *>
 
+                        val playerDoc = playerDataList[currentUid] as Map<String, *>
+                        userNickName = playerDoc["nickname"].toString()
+
                         setMyTurnState(roomData, playerDataList)
                         setTurnInit()
                         setRollBtnControl()
                         val roomCount = value.data!!["room_total_turn"].toString().toInt()
                         binding.textPlayRoomCurrentTurn.text = "turn: $roomCount"
-                        if(roomCount >= 13) {
+                        if (roomCount >= 13) {
                             Toast.makeText(mContext, "게임종료", Toast.LENGTH_SHORT).show()
                             binding.btnDiceRoll.isEnabled = false
                         }
@@ -231,6 +237,25 @@ class FragmentPlayRoom : Fragment() {
                             dice4.setServerImage(diceList[3])
                             dice5.setServerImage(diceList[4])
                         }
+                    }
+                }
+            }
+    }
+
+    private fun scoreBoardListener() {
+        db.collection("room_score_board").document(roomDocId)
+            .addSnapshotListener { value, _ ->
+                if (value == null) {
+                    Log.d("testRoom", "data failed")
+                } else {
+                    val boardData = value.data
+                    if (boardData == null) {
+                        Log.d("testRoom", "data failed")
+                    } else {
+                        val scoreData = data as Map<String, Any>
+                        binding.rcPlayRoomTotalScore.adapter = PlayRoomTotalScoreAdapter(scoreData)
+
+
                     }
                 }
             }
@@ -299,24 +324,24 @@ class FragmentPlayRoom : Fragment() {
     private fun diceRoll() {
         val diceList = mutableListOf<Int>()
 
-        if(dice1Clicked) {
+        if (dice1Clicked) {
             dice1.roll()
             dice1.animation.start()
         }
 
-        if(dice2Clicked) {
+        if (dice2Clicked) {
             dice2.roll()
             dice2.animation.start()
         }
-        if(dice3Clicked) {
+        if (dice3Clicked) {
             dice3.roll()
             dice3.animation.start()
         }
-        if(dice4Clicked) {
+        if (dice4Clicked) {
             dice4.roll()
             dice4.animation.start()
         }
-        if(dice5Clicked) {
+        if (dice5Clicked) {
             dice5.roll()
             dice5.animation.start()
         }
@@ -403,7 +428,7 @@ class FragmentPlayRoom : Fragment() {
                     if (data != null) {
                         val totalTurn = data["room_total_turn"].toString().toInt()
 
-                        if(totalTurn == 14) {
+                        if (totalTurn == 14) {
                             Toast.makeText(mContext, "게임종료", Toast.LENGTH_SHORT).show()
                         } else {
                             val roomTotalTurn = mapOf(
@@ -419,8 +444,8 @@ class FragmentPlayRoom : Fragment() {
     }
 
     private fun setUserScoreBoard() {
-        CoroutineScope(IO).launch{
-            val score = RoomScoreData()
+        CoroutineScope(IO).launch {
+            val score = RoomScoreData(nickname = userNickName)
             val userScore = mapOf(
                 currentUid to score
             )
@@ -431,66 +456,128 @@ class FragmentPlayRoom : Fragment() {
 
     private fun setDiceNotClick(view: ImageView, num: Int) {
         view.isClickable = false
-        when(num) {
-            1 -> { dice1Clicked = true }
-            2 -> { dice2Clicked = true }
-            3 -> { dice3Clicked = true }
-            4 -> { dice4Clicked = true }
-            5 -> { dice5Clicked = true }
+        when (num) {
+            1 -> {
+                dice1Clicked = true
+            }
+
+            2 -> {
+                dice2Clicked = true
+            }
+
+            3 -> {
+                dice3Clicked = true
+            }
+
+            4 -> {
+                dice4Clicked = true
+            }
+
+            5 -> {
+                dice5Clicked = true
+            }
         }
         view.setColorFilter(Color.WHITE, PorterDuff.Mode.MULTIPLY)
     }
 
     private fun viewOnClick() {
-        val diceViewList = listOf(binding.imgPlayDice1, binding.imgPlayDice2,binding.imgPlayDice3, binding.imgPlayDice4, binding.imgPlayDice5)
-        for((index, view) in diceViewList.withIndex()) {
+        val diceViewList = listOf(
+            binding.imgPlayDice1,
+            binding.imgPlayDice2,
+            binding.imgPlayDice3,
+            binding.imgPlayDice4,
+            binding.imgPlayDice5
+        )
+        for ((index, view) in diceViewList.withIndex()) {
             view.setOnClickListener {
-                when(index) {
+                when (index) {
                     0 -> {
                         dice1Clicked = !dice1Clicked
                         Log.d("testDice", dice1Clicked.toString())
-                        if(dice1Clicked) {
-                            binding.imgPlayDice1.setColorFilter(Color.WHITE, PorterDuff.Mode.MULTIPLY)
+                        if (dice1Clicked) {
+                            binding.imgPlayDice1.setColorFilter(
+                                Color.WHITE,
+                                PorterDuff.Mode.MULTIPLY
+                            )
                         } else {
-                            binding.imgPlayDice1.setColorFilter(Color.parseColor("#BDBDBD"), PorterDuff.Mode.MULTIPLY)
+                            binding.imgPlayDice1.setColorFilter(
+                                Color.parseColor("#BDBDBD"),
+                                PorterDuff.Mode.MULTIPLY
+                            )
                         }
                     }
+
                     1 -> {
                         dice2Clicked = !dice2Clicked
-                        if(dice2Clicked) {
-                            binding.imgPlayDice2.setColorFilter(Color.WHITE, PorterDuff.Mode.MULTIPLY)
+                        if (dice2Clicked) {
+                            binding.imgPlayDice2.setColorFilter(
+                                Color.WHITE,
+                                PorterDuff.Mode.MULTIPLY
+                            )
                         } else {
-                            binding.imgPlayDice2.setColorFilter(Color.parseColor("#BDBDBD"), PorterDuff.Mode.MULTIPLY)
+                            binding.imgPlayDice2.setColorFilter(
+                                Color.parseColor("#BDBDBD"),
+                                PorterDuff.Mode.MULTIPLY
+                            )
                         }
                     }
+
                     2 -> {
                         dice3Clicked = !dice3Clicked
-                        if(dice3Clicked) {
-                            binding.imgPlayDice3.setColorFilter(Color.WHITE, PorterDuff.Mode.MULTIPLY)
+                        if (dice3Clicked) {
+                            binding.imgPlayDice3.setColorFilter(
+                                Color.WHITE,
+                                PorterDuff.Mode.MULTIPLY
+                            )
                         } else {
-                            binding.imgPlayDice3.setColorFilter(Color.parseColor("#BDBDBD"), PorterDuff.Mode.MULTIPLY)
+                            binding.imgPlayDice3.setColorFilter(
+                                Color.parseColor("#BDBDBD"),
+                                PorterDuff.Mode.MULTIPLY
+                            )
                         }
                     }
+
                     3 -> {
                         dice4Clicked = !dice4Clicked
-                        if(dice4Clicked) {
-                            binding.imgPlayDice4.setColorFilter(Color.WHITE, PorterDuff.Mode.MULTIPLY)
+                        if (dice4Clicked) {
+                            binding.imgPlayDice4.setColorFilter(
+                                Color.WHITE,
+                                PorterDuff.Mode.MULTIPLY
+                            )
                         } else {
-                            binding.imgPlayDice4.setColorFilter(Color.parseColor("#BDBDBD"), PorterDuff.Mode.MULTIPLY)
+                            binding.imgPlayDice4.setColorFilter(
+                                Color.parseColor("#BDBDBD"),
+                                PorterDuff.Mode.MULTIPLY
+                            )
                         }
                     }
+
                     4 -> {
                         dice5Clicked = !dice5Clicked
-                        if(dice5Clicked) {
-                            binding.imgPlayDice5.setColorFilter(Color.WHITE, PorterDuff.Mode.MULTIPLY)
+                        if (dice5Clicked) {
+                            binding.imgPlayDice5.setColorFilter(
+                                Color.WHITE,
+                                PorterDuff.Mode.MULTIPLY
+                            )
                         } else {
-                            binding.imgPlayDice5.setColorFilter(Color.parseColor("#BDBDBD"), PorterDuff.Mode.MULTIPLY)
+                            binding.imgPlayDice5.setColorFilter(
+                                Color.parseColor("#BDBDBD"),
+                                PorterDuff.Mode.MULTIPLY
+                            )
                         }
                     }
                 }
 
             }
         }
+    }
+
+    private fun totalScore() {
+        db.collection("room_score_board").document(roomDocId)
+            .get()
+            .addOnSuccessListener {
+
+            }
     }
 
 }
