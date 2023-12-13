@@ -17,17 +17,21 @@
     <string name="btn_ready_en">Ready</string>
     <string name="btn_exit_room">Exit</string>
     <string name="play_board_ones">Ones</string>
-    <string name="play_board_four_of_a_kind">Four of a Kind</string>
+    <string name="play_board_four_of_a_kind">4 of a Kind</string>
     <string name="play_board_twos">Twos</string>
     <string name="play_board_full_house">Full House</string>
     <string name="play_board_threes">Threes</string>
     <string name="play_board_four">four</string>
     <string name="play_board_fours">fours</string>
-    <string name="play_board_big_straight">Big Straight</string>
+    <string name="play_board_big_straight">R.Straight</string>
     <string name="play_board_fives">Fives</string>
     <string name="play_board_choice">Choice</string>
     <string name="play_board_sixes">Sixes</string>
     <string name="play_board_yacht">Yacht</string>
     <string name="play_board_total_score">Total Score</string>
-    <string name="play_board_little_straight">Little Straight</string>
+    <string name="play_board_bonus_score">Bonus Score</string>
+    <string name="play_board_little_straight">L.Straight</string>
+    <string name="fragment_menu_create_room">Create Room</string>
+    <string name="fragment_menu_room_list">Room List</string>
+    <string name="fragment_menu_my_profile">My Profile</string>
 </resources>

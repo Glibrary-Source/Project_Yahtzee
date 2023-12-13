@@ -78,7 +78,7 @@ class FragmentReadyRoom : Fragment() {
                 if (value == null) {
                     Log.d("testRoom", "data failed")
                 } else {
-                    try{
+                    try {
                         val roomData = value.toObject(RoomData::class.java)!!
                         val playerDataList = roomData.player_data
 
@@ -87,7 +87,10 @@ class FragmentReadyRoom : Fragment() {
                         setPlayerList(playerDataList)
                         checkAllReady(playerDataList, roomData)
                         roomStartState(roomData)
-                    } catch (_: Exception) {}
+                        roomManagerSet(roomData)
+                        setRoomTurn(roomData)
+                    } catch (_: Exception) {
+                    }
                 }
             }
     }
@@ -108,11 +111,11 @@ class FragmentReadyRoom : Fragment() {
 
     private fun checkAllReady(playerDataList: Map<String, Any>, roomData: RoomData) {
         val readyList = mutableListOf<String>()
-        for((_, value) in playerDataList) {
+        for ((_, value) in playerDataList) {
             val player = value as Map<String, Any>
             readyList.add(player["waitstate"].toString())
         }
-        if(!readyList.contains("wait") && currentUid == roomData.room_manager) {
+        if (!readyList.contains("wait") && currentUid == roomData.room_manager && readyList.size > 1) {
             binding.frameBtnStart.visibility = View.VISIBLE
             setStartBtn()
         }
@@ -128,7 +131,6 @@ class FragmentReadyRoom : Fragment() {
         )
         db.collection("room_list").document(roomDocId)
             .set(user, SetOptions.merge())
-            .addOnSuccessListener {}
     }
 
     private fun setStartBtn() {
@@ -140,12 +142,12 @@ class FragmentReadyRoom : Fragment() {
     }
 
     private fun roomStartState(roomData: RoomData) {
-        if(roomData.room_state == "start") {
-            val action = FragmentReadyRoomDirections.actionFragmentReadyRoomToFragmentPlayRoom(roomDocId)
+        if (roomData.room_state == "start") {
+            val action =
+                FragmentReadyRoomDirections.actionFragmentReadyRoomToFragmentPlayRoom(roomDocId)
             findNavController().navigate(action)
         }
     }
-
 
     private fun exitPlayer() {
         val roomRef = db.collection("room_list").document(roomDocId)
@@ -154,6 +156,12 @@ class FragmentReadyRoom : Fragment() {
             val snapshot = transaction.get(roomRef)
 
             val playerData = snapshot["player_data"] as? MutableMap<String, Any>
+            val roomList = snapshot["room_player_list"] as? MutableList<String>
+
+            roomList?.let {
+                it.remove(currentUid)
+                transaction.update(roomRef, "room_player_list", it)
+            }
 
             playerData?.let {
                 it.remove(currentUid)
@@ -166,6 +174,7 @@ class FragmentReadyRoom : Fragment() {
                     transaction.update(roomRef, "player_data", it)
                 }
             }
+
             null // 트랜잭션이 완료되었음을 나타내기 위해 null을 반환합니다.
         }.addOnSuccessListener {
             val action = FragmentReadyRoomDirections.actionFragmentReadyRoomToFragmentRoomList()
@@ -175,4 +184,30 @@ class FragmentReadyRoom : Fragment() {
             Log.e("exitPlayer", "트랜잭션 실패: $e")
         }
     }
+
+    private fun roomManagerSet(roomData: RoomData) {
+        if (roomData.room_player_list[0] == currentUid) {
+            val manager = mapOf(
+                "room_manager" to currentUid
+            )
+            db.collection("room_list").document(roomDocId)
+                .update(manager)
+        }
+    }
+
+    private fun setRoomTurn(roomData: RoomData) {
+        if (roomData.room_player_list.contains(currentUid)) {
+            val turn = roomData.room_player_list.indexOf(currentUid) + 1
+            val player = mapOf(
+                "player_data" to mapOf(
+                    currentUid to mapOf(
+                        "playerturn" to turn
+                    )
+                )
+            )
+            db.collection("room_list").document(roomDocId)
+                .set(player, SetOptions.merge())
+        }
+    }
+
 }

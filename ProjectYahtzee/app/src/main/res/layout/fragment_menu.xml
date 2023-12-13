@@ -13,8 +13,8 @@
         android:orientation="vertical"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginStart="56dp"
-        android:layout_marginEnd="56dp"
+        android:layout_marginStart="48dp"
+        android:layout_marginEnd="48dp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"
@@ -33,11 +33,13 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent">
 
-            <ImageView
-                android:layout_width="48dp"
-                android:layout_height="48dp"
+            <com.airbnb.lottie.LottieAnimationView
+                android:layout_width="52dp"
+                android:layout_height="52dp"
                 android:layout_gravity="start"
-                android:src="@drawable/icon_dice"
+                app:lottie_rawRes="@raw/dice_roll_animation"
+                app:lottie_autoPlay="true"
+                app:lottie_loop="true"
                 tools:ignore="ContentDescription" />
 
             <TextView
@@ -47,7 +49,8 @@
                 android:fontFamily="@font/pattaya"
                 android:layout_gravity="center"
                 android:letterSpacing="0.1"
-                android:text="Create Room"
+                android:maxLines="1"
+                android:text="@string/fragment_menu_create_room"
                 android:textColor="@color/white"
                 android:textSize="32dp" />
         </LinearLayout>
@@ -65,13 +68,13 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/linear_create_room">
 
-            <ImageView
-                android:layout_width="48dp"
-                android:layout_height="48dp"
+            <com.airbnb.lottie.LottieAnimationView
+                android:layout_width="52dp"
+                android:layout_height="52dp"
                 android:layout_marginEnd="8dp"
-                android:layout_gravity="start"
-                android:src="@drawable/icon_menu"
-                tools:ignore="ContentDescription" />
+                app:lottie_rawRes="@raw/icon_list_animation"
+                app:lottie_autoPlay="true"
+                app:lottie_loop="true" />
 
             <TextView
                 android:layout_width="wrap_content"
@@ -80,7 +83,7 @@
                 android:fontFamily="@font/pattaya"
                 android:layout_gravity="center"
                 android:letterSpacing="0.1"
-                android:text="Room List"
+                android:text="@string/fragment_menu_room_list"
                 android:textColor="@color/white"
                 android:textSize="32dp" />
         </LinearLayout>
@@ -99,19 +102,20 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/linear_room_list">
 
-            <ImageView
-                android:layout_width="48dp"
-                android:layout_height="48dp"
+            <com.airbnb.lottie.LottieAnimationView
+                android:layout_width="52dp"
+                android:layout_height="52dp"
                 android:layout_marginEnd="8dp"
-                android:layout_gravity="start"
-                android:src="@drawable/icon_profile"
+                app:lottie_rawRes="@raw/icon_profile_animation"
+                app:lottie_autoPlay="true"
+                app:lottie_loop="true"
                 tools:ignore="ContentDescription" />
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:fontFamily="@font/pattaya"
-                android:text="My Profile"
+                android:text="@string/fragment_menu_my_profile"
                 android:layout_marginStart="8dp"
                 android:letterSpacing="0.1"
                 android:layout_gravity="center"

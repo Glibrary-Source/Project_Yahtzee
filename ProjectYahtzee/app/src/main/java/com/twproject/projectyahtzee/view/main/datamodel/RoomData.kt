@@ -9,6 +9,6 @@ data class RoomData (
     val room_number: Int = 0,
     val room_player_turn: Int = 0,
     val room_dice_roll: Boolean = false,
-    val current_player_list: List<String> = listOf(),
+    val room_player_list: List<String> = listOf(),
     val player_data: Map<String, Any> = mapOf()
 )

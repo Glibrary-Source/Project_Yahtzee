@@ -78,16 +78,20 @@ class RoomLIstAdapter(
         db.runTransaction { transaction ->
             // 현재 playerturn의 값을 가져옴
             val currentData = transaction.get(roomRef)
-            val currentPlayers = currentData.toObject(RoomData::class.java)?.player_data
+            val roomData = currentData.toObject(RoomData::class.java)
+            val currentPlayers = roomData?.player_data
+            val roomPlayerList = roomData?.room_player_list?.toMutableList()
             val currentPlayerturn = currentPlayers?.size!!
 
             // playerturn을 업데이트
             playerData.playerturn = currentPlayerturn + 1
+            roomPlayerList?.add(currentUid)
 
             val newData = mapOf(
                 "player_data" to mapOf(
                     currentUid to playerData
-                )
+                ),
+                "room_player_list" to roomPlayerList
             )
 
             // 업데이트된 데이터를 설정
@@ -95,7 +99,7 @@ class RoomLIstAdapter(
 
             // 업데이트된 playerturn 값을 반환
             playerData.playerturn
-        }.addOnSuccessListener { newPlayerturn ->
+        }.addOnSuccessListener { _ ->
             // 새 playerturn 값을 필요에 따라 사용
             val action = FragmentRoomListDirections.actionFragmentRoomListToFragmentReadyRoom(item.room_doc_id)
             view.findNavController().navigate(action)

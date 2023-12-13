@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.Color
 import android.graphics.PorterDuff
+import android.media.MediaPlayer
 import android.os.Bundle
 import android.util.Log
 import androidx.fragment.app.Fragment
@@ -64,6 +65,7 @@ class FragmentPlayRoom : Fragment() {
     private var firstTurn = true
     private var diceRollCount = 1
     private var myTurnState = false
+    private var boardFirstNameChecker = true
     private val roomData by navArgs<FragmentPlayRoomArgs>()
     private var currentUid = FirebaseAuth.getInstance().uid.toString()
     val db = Firebase.firestore
@@ -87,7 +89,7 @@ class FragmentPlayRoom : Fragment() {
         savedInstanceState: Bundle?
     ): View {
         binding = FragmentPlayRoomBinding.inflate(inflater)
-        scoreBoard = ScoreBoard(binding.includeScoreBoard, mContext, binding)
+        scoreBoard = ScoreBoard(binding.includeScoreBoard, mContext, binding, db, roomDocId,currentUid)
 
         dice1 = Dice(binding.imgPlayDice1)
         dice2 = Dice(binding.imgPlayDice2)
@@ -101,13 +103,13 @@ class FragmentPlayRoom : Fragment() {
         roomRefreshListener()
         roomTurnRefreshListener()
         diceRefreshListener()
-        setUserScoreBoard()
 
         binding.imgPlayRoomPlayer.setOnClickListener {
             playerVisibleControl()
         }
 
-        binding.btnDiceRoll.onThrottleClick {
+        binding.imgPlayRoomRollDice.onThrottleClick {
+            playDiceSound()
             checkFirstRoll()
             diceRoll()
             CoroutineScope(Main).launch {
@@ -117,22 +119,23 @@ class FragmentPlayRoom : Fragment() {
                 it.isClickable = true
             }
 
-            if (diceRollCount == 1) {
-                diceRollCount = 2
+            if (diceRollCount == 1 || diceRollCount == 2) {
+                diceRollCount += 1
             } else {
-                binding.btnDiceRoll.isEnabled = false
-                binding.btnDiceRoll.setTextColor(
-                    ContextCompat.getColor(
-                        mContext,
-                        R.color.colorPrimary
-                    )
-                )
+                binding.imgPlayRoomRollDice.isClickable = false
+                binding.imgPlayRoomRollDice.pauseAnimation()
+                binding.imgPlayRoomRollDice.progress = 0.97f
             }
         }
 
         viewOnClick()
 
         return binding.root
+    }
+
+    private fun playDiceSound() {
+        val mediaPlayer = MediaPlayer.create(mContext, R.raw.roll_dice)
+        mediaPlayer.start()
     }
 
 
@@ -152,6 +155,8 @@ class FragmentPlayRoom : Fragment() {
                 } else {
                     val roomData = value.toObject(RoomData::class.java)!!
                     val playerDataList = roomData.player_data as Map<String, *>
+
+                    scoreBoardNameInit(playerDataList)
 
                     if (firstTurn) {
                         setTurnCollection(roomData, playerDataList)
@@ -190,7 +195,9 @@ class FragmentPlayRoom : Fragment() {
                         binding.textPlayRoomCurrentTurn.text = "turn: $roomCount"
                         if(roomCount >= 13) {
                             Toast.makeText(mContext, "게임종료", Toast.LENGTH_SHORT).show()
-                            binding.btnDiceRoll.isEnabled = false
+                            binding.imgPlayRoomRollDice.isClickable = false
+                            binding.imgPlayRoomRollDice.pauseAnimation()
+                            binding.imgPlayRoomRollDice.progress = 0.97f
                         }
 
                     }
@@ -236,6 +243,14 @@ class FragmentPlayRoom : Fragment() {
             }
     }
 
+    private fun scoreBoardNameInit(playerDataList: Map<String, *>) {
+        if(boardFirstNameChecker) {
+            val user = playerDataList[currentUid] as Map<String, *>
+            binding.includeScoreBoard.textScoreBoard1PlayerName.text = user["nickname"].toString()
+            boardFirstNameChecker = false
+        }
+    }
+
     private fun setMyTurnState(roomData: RoomData, playerDataList: Map<String, *>) {
         val user = playerDataList[currentUid] as Map<String, *>
         myTurnState = roomData.room_player_turn == user["playerturn"].toString().toInt()
@@ -252,7 +267,7 @@ class FragmentPlayRoom : Fragment() {
     }
 
     private fun setRcViewPlayer(playerDataList: Map<String, *>) {
-        rcPlayerView.adapter = PlayRoomPlayerAdapter(playerDataList)
+        rcPlayerView.adapter = PlayRoomPlayerAdapter(playerDataList, binding.includeScoreBoard, db, roomDocId, mContext)
     }
 
     private fun setCurrentPlayerNotice(roomData: RoomData, playerDataList: Map<String, *>) {
@@ -280,11 +295,12 @@ class FragmentPlayRoom : Fragment() {
 
     private fun setRollBtnControl() {
         if (myTurnState) {
-            binding.btnDiceRoll.isEnabled = true
-            binding.btnDiceRoll.setTextColor(ContextCompat.getColor(mContext, R.color.white))
+            binding.imgPlayRoomRollDice.isClickable = true
+            binding.imgPlayRoomRollDice.playAnimation()
         } else {
-            binding.btnDiceRoll.isEnabled = false
-            binding.btnDiceRoll.setTextColor(ContextCompat.getColor(mContext, R.color.colorPrimary))
+            binding.imgPlayRoomRollDice.isClickable = false
+            binding.imgPlayRoomRollDice.pauseAnimation()
+            binding.imgPlayRoomRollDice.progress = 0.97f
         }
     }
 
@@ -415,17 +431,6 @@ class FragmentPlayRoom : Fragment() {
                     }
                 }
             diceRollCount = 1
-        }
-    }
-
-    private fun setUserScoreBoard() {
-        CoroutineScope(IO).launch{
-            val score = RoomScoreData()
-            val userScore = mapOf(
-                currentUid to score
-            )
-            db.collection("room_score_board").document(roomDocId)
-                .set(userScore, SetOptions.merge())
         }
     }
 

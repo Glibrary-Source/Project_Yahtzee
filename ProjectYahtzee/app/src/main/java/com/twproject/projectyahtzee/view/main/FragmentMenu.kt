@@ -8,6 +8,7 @@ import android.view.ViewGroup
 import androidx.navigation.fragment.findNavController
 import com.twproject.projectyahtzee.vbutils.ButtonAnimation
 import com.twproject.projectyahtzee.databinding.FragmentMenuBinding
+import com.twproject.projectyahtzee.vbutils.onThrottleClick
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers.Main
 import kotlinx.coroutines.delay
@@ -24,9 +25,9 @@ class FragmentMenu : Fragment() {
     ): View {
         binding = FragmentMenuBinding.inflate(layoutInflater)
 
-        binding.linearCreateRoom.setOnClickListener { navigateToDestination(FragmentCreateRoom(),it) }
-        binding.linearRoomList.setOnClickListener { navigateToDestination(FragmentRoomList(),it) }
-        binding.linearMyProfile.setOnClickListener { navigateToDestination(FragmentMyProfile(),it) }
+        binding.linearCreateRoom.onThrottleClick { navigateToDestination(FragmentCreateRoom(),it) }
+        binding.linearRoomList.onThrottleClick { navigateToDestination(FragmentRoomList(),it) }
+        binding.linearMyProfile.onThrottleClick { navigateToDestination(FragmentMyProfile(),it) }
 
         return binding.root
     }
