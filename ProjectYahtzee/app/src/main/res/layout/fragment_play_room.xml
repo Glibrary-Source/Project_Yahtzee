@@ -6,14 +6,12 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:paddingBottom="8dp"
-    android:background="@color/colorPrimary"
     tools:context=".view.main.FragmentPlayRoom">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@color/colorPrimary"
-        tools:context=".view.main.FragmentPlayRoom">
+        android:background="@color/colorPrimary" >
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/cs_play_room_player"
@@ -35,164 +33,179 @@
 
             <TextView
                 android:id="@+id/text_play_room_current_player"
+                style="@style/MyTextViewStyle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="4dp"
-                android:textSize="24dp"
                 android:text="turn"
                 android:textColor="@color/white"
-                android:fontFamily="@font/pattaya"
-                app:layout_constraintStart_toEndOf="@id/img_play_room_player"
-                app:layout_constraintEnd_toStartOf="@id/text_play_room_current_turn"
-                app:layout_constraintTop_toTopOf="@id/img_play_room_player"
-                app:layout_constraintBottom_toBottomOf="@id/img_play_room_player"/>
-
-            <TextView
-                android:id="@+id/text_play_room_current_turn"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="4dp"
                 android:textSize="24dp"
-                android:text="turn: 1"
-                android:textColor="@color/white"
-                android:fontFamily="@font/pattaya"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toTopOf="@id/img_play_room_player"
-                app:layout_constraintBottom_toBottomOf="@id/img_play_room_player"/>
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="@+id/img_play_room_player"
+                app:layout_constraintBottom_toBottomOf="@+id/img_play_room_player"
+                app:layout_constraintEnd_toEndOf="parent"/>
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/rc_play_room_extend_player"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
                 android:visibility="gone"
                 app:layout_constraintTop_toBottomOf="@id/img_play_room_player"
-                app:layout_constraintStart_toStartOf="parent"
-                android:orientation="horizontal">
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent" >
             </androidx.recyclerview.widget.RecyclerView>
 
             <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/linear_total_score"
+                android:id="@+id/rc_play_room_total_score"
                 android:orientation="vertical"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:background="@drawable/default_profile_bg"
+                android:layout_marginTop="8dp"
+                android:padding="8dp"
+                android:visibility="gone"
+                app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/rc_play_room_extend_player"/>
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
+        <TextView
+            android:id="@+id/text_score_board1_player_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="14dp"
+            tools:text="Board User: 야추중독자"
+            android:textColor="@color/white"
+            android:layout_marginTop="8dp"
+            style="@style/MyTextViewStyle"
+            app:layout_constraintTop_toBottomOf="@id/cs_play_room_player"
+            app:layout_constraintStart_toStartOf="@id/cs_play_room_board" />
+
         <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/cs_play_room_board"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_margin="16dp"
+            android:layout_marginStart="16dp"
+            android:layout_marginEnd="16dp"
+            android:layout_marginTop="2dp"
             android:background="@drawable/default_profile_bg"
             android:padding="4dp"
-            app:layout_constraintBottom_toTopOf="@id/cs_play_room_role_dice"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/cs_play_room_player">
+            app:layout_constraintTop_toBottomOf="@id/text_score_board1_player_name">
 
             <include
                 android:id="@+id/include_score_board"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
                 layout="@layout/score_board" />
         </androidx.constraintlayout.widget.ConstraintLayout>
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/cs_play_room_role_dice"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            android:layout_marginEnd="10dp"
-            android:padding="10dp"
-            android:background="@drawable/default_profile_bg"
+            android:layout_marginEnd="16dp"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="12dp"
             android:animateLayoutChanges="true"
-            app:layout_constraintEnd_toStartOf="@id/frame_play_room_roll_dice"
-            app:layout_constraintStart_toStartOf="@id/cs_play_room_board"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/cs_play_room_board">
 
-            <ImageView
-                android:id="@+id/img_play_dice_1"
-                android:layout_width="52dp"
-                android:layout_height="52dp"
-                android:src="@drawable/icon_dice_1"
-                android:layout_marginEnd="4dp"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintEnd_toStartOf="@+id/img_play_dice_2"
-                app:layout_constraintHorizontal_bias="0.5"
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/cs_play_room_dices"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:padding="10dp"
+                android:background="@drawable/default_profile_bg"
                 app:layout_constraintStart_toStartOf="parent"
-                tools:ignore="ContentDescription" />
-
-            <ImageView
-                android:id="@+id/img_play_dice_2"
-                android:layout_width="52dp"
-                android:layout_height="52dp"
-                android:src="@drawable/icon_dice_2"
-                android:layout_marginEnd="4dp"
-                app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintEnd_toStartOf="@+id/img_play_dice_3"
-                app:layout_constraintHorizontal_bias="0.5"
-                app:layout_constraintStart_toEndOf="@+id/img_play_dice_1"
-                tools:ignore="ContentDescription" />
+                app:layout_constraintBottom_toBottomOf="parent">
 
-            <ImageView
-                android:id="@+id/img_play_dice_3"
-                android:layout_width="52dp"
-                android:layout_height="52dp"
-                android:src="@drawable/icon_dice_3"
-                android:layout_marginEnd="4dp"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintEnd_toStartOf="@+id/img_play_dice_4"
-                app:layout_constraintHorizontal_bias="0.5"
-                app:layout_constraintStart_toEndOf="@+id/img_play_dice_2"
-                tools:ignore="ContentDescription" />
+                <ImageView
+                    android:id="@+id/img_play_dice_1"
+                    android:layout_width="52dp"
+                    android:layout_height="52dp"
+                    android:src="@drawable/icon_dice_1"
+                    android:layout_marginEnd="4dp"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintEnd_toStartOf="@+id/img_play_dice_2"
+                    app:layout_constraintHorizontal_bias="0.5"
+                    app:layout_constraintStart_toStartOf="parent"
+                    tools:ignore="ContentDescription" />
 
-            <ImageView
-                android:id="@+id/img_play_dice_4"
-                android:layout_width="52dp"
-                android:layout_height="52dp"
-                android:src="@drawable/icon_dice_4"
-                android:layout_marginEnd="4dp"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintEnd_toStartOf="@+id/img_play_dice_5"
-                app:layout_constraintHorizontal_bias="0.5"
-                app:layout_constraintStart_toEndOf="@+id/img_play_dice_3"
-                tools:ignore="ContentDescription" />
+                <ImageView
+                    android:id="@+id/img_play_dice_2"
+                    android:layout_width="52dp"
+                    android:layout_height="52dp"
+                    android:src="@drawable/icon_dice_2"
+                    android:layout_marginEnd="4dp"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintEnd_toStartOf="@+id/img_play_dice_3"
+                    app:layout_constraintHorizontal_bias="0.5"
+                    app:layout_constraintStart_toEndOf="@+id/img_play_dice_1"
+                    tools:ignore="ContentDescription" />
 
-            <ImageView
-                android:id="@+id/img_play_dice_5"
-                android:layout_width="52dp"
-                android:layout_height="52dp"
-                android:src="@drawable/icon_dice_5"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
+                <ImageView
+                    android:id="@+id/img_play_dice_3"
+                    android:layout_width="52dp"
+                    android:layout_height="52dp"
+                    android:src="@drawable/icon_dice_3"
+                    android:layout_marginEnd="4dp"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintEnd_toStartOf="@+id/img_play_dice_4"
+                    app:layout_constraintHorizontal_bias="0.5"
+                    app:layout_constraintStart_toEndOf="@+id/img_play_dice_2"
+                    tools:ignore="ContentDescription" />
+
+                <ImageView
+                    android:id="@+id/img_play_dice_4"
+                    android:layout_width="52dp"
+                    android:layout_height="52dp"
+                    android:src="@drawable/icon_dice_4"
+                    android:layout_marginEnd="4dp"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintEnd_toStartOf="@+id/img_play_dice_5"
+                    app:layout_constraintHorizontal_bias="0.5"
+                    app:layout_constraintStart_toEndOf="@+id/img_play_dice_3"
+                    tools:ignore="ContentDescription" />
+
+                <ImageView
+                    android:id="@+id/img_play_dice_5"
+                    android:layout_width="52dp"
+                    android:layout_height="52dp"
+                    android:src="@drawable/icon_dice_5"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintHorizontal_bias="0.5"
+                    app:layout_constraintStart_toEndOf="@+id/img_play_dice_4"
+                    tools:ignore="ContentDescription" />
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <FrameLayout
+                android:id="@+id/frame_play_room_roll_dice"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:padding="4dp"
+                android:background="@drawable/default_profile_bg"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHorizontal_bias="0.5"
-                app:layout_constraintStart_toEndOf="@+id/img_play_dice_4"
-                tools:ignore="ContentDescription" />
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent">
+
+                <com.airbnb.lottie.LottieAnimationView
+                    android:id="@+id/img_play_room_roll_dice"
+                    android:layout_width="63dp"
+                    android:layout_height="63dp"
+                    app:lottie_rawRes="@raw/dice_roll_animation2" />
+            </FrameLayout>
         </androidx.constraintlayout.widget.ConstraintLayout>
-        <FrameLayout
-            android:id="@+id/frame_play_room_roll_dice"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:padding="4dp"
-            android:background="@drawable/default_profile_bg"
-            app:layout_constraintStart_toEndOf="@id/cs_play_room_role_dice"
-            app:layout_constraintEnd_toEndOf="@id/cs_play_room_board"
-            app:layout_constraintTop_toTopOf="@id/cs_play_room_role_dice"
-            app:layout_constraintBottom_toBottomOf="@id/cs_play_room_role_dice">
-            
-            <com.airbnb.lottie.LottieAnimationView
-                android:id="@+id/img_play_room_roll_dice"
-                android:layout_width="62dp"
-                android:layout_height="62dp"
-                app:lottie_rawRes="@raw/dice_roll_animation2"
-                app:lottie_loop="true"/>
-        </FrameLayout>
 
         <Button
             android:id="@+id/btn_play_test"

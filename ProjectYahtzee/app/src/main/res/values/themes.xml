@@ -10,4 +10,9 @@
     <style name="Theme.ProjectYahtzee" parent="Base.Theme.ProjectYahtzee">
         <item name="android:windowIsTranslucent">true</item>
     </style>
+
+    <style name="MyTextViewStyle">
+        <item name="android:fontFamily">@font/bebas_neue_regular</item>
+    </style>
+
 </resources>

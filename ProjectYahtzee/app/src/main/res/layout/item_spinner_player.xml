@@ -2,7 +2,7 @@
 <TextView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/spinner_text_view"
-    android:fontFamily="@font/pattaya"
+    style="@style/MyTextViewStyle"
     android:textSize="18dp"
     android:textColor="@color/white"
     android:gravity="center"

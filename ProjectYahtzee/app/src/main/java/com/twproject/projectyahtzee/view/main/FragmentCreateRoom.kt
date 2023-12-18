@@ -126,10 +126,8 @@ class FragmentCreateRoom : Fragment() {
                 )
 
             }.addOnSuccessListener {
-                // 트랜잭션 및 데이터 설정이 성공하면, 이제 레디 룸으로 이동
                 moveReadyRoom(roomDocId)
             }.addOnFailureListener { exception ->
-                // 트랜잭션 실패를 처리하는 코드 (필요한 경우)
                 Log.e("createRoom", "Transaction failed", exception)
             }
         }

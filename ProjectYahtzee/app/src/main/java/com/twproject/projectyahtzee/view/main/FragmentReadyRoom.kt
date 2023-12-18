@@ -175,7 +175,7 @@ class FragmentReadyRoom : Fragment() {
                 }
             }
 
-            null // 트랜잭션이 완료되었음을 나타내기 위해 null을 반환합니다.
+            null
         }.addOnSuccessListener {
             val action = FragmentReadyRoomDirections.actionFragmentReadyRoomToFragmentRoomList()
             findNavController().navigate(action)

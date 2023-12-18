@@ -14,12 +14,10 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
-import androidx.core.content.ContextCompat
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.firestore.SetOptions
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import com.twproject.banyeomiji.vbutility.BackPressCallBackManager
@@ -27,9 +25,9 @@ import com.twproject.projectyahtzee.R
 import com.twproject.projectyahtzee.databinding.FragmentPlayRoomBinding
 import com.twproject.projectyahtzee.vbutils.onThrottleClick
 import com.twproject.projectyahtzee.view.main.adapter.PlayRoomPlayerAdapter
+import com.twproject.projectyahtzee.view.main.adapter.TotalScoreAdapter
 import com.twproject.projectyahtzee.view.main.data.DiceImageControl
 import com.twproject.projectyahtzee.view.main.datamodel.RoomData
-import com.twproject.projectyahtzee.view.main.datamodel.RoomScoreData
 import com.twproject.projectyahtzee.view.main.util.Dice
 import com.twproject.projectyahtzee.view.main.util.ScoreBoard
 import kotlinx.coroutines.CoroutineScope
@@ -90,6 +88,7 @@ class FragmentPlayRoom : Fragment() {
     ): View {
         binding = FragmentPlayRoomBinding.inflate(inflater)
         scoreBoard = ScoreBoard(binding.includeScoreBoard, mContext, binding, db, roomDocId,currentUid)
+        binding.imgPlayRoomRollDice.progress = 0.97f
 
         dice1 = Dice(binding.imgPlayDice1)
         dice2 = Dice(binding.imgPlayDice2)
@@ -119,12 +118,12 @@ class FragmentPlayRoom : Fragment() {
                 it.isClickable = true
             }
 
-            if (diceRollCount == 1 || diceRollCount == 2) {
-                diceRollCount += 1
+            binding.imgPlayRoomRollDice.playAnimation()
+            if (diceRollCount <= 2) {
+                diceRollCount ++
             } else {
                 binding.imgPlayRoomRollDice.isClickable = false
-                binding.imgPlayRoomRollDice.pauseAnimation()
-                binding.imgPlayRoomRollDice.progress = 0.97f
+                binding.imgPlayRoomRollDice.isEnabled = false
             }
         }
 
@@ -191,15 +190,17 @@ class FragmentPlayRoom : Fragment() {
                         setMyTurnState(roomData, playerDataList)
                         setTurnInit()
                         setRollBtnControl()
+
                         val roomCount = value.data!!["room_total_turn"].toString().toInt()
-                        binding.textPlayRoomCurrentTurn.text = "turn: $roomCount"
                         if(roomCount >= 13) {
                             Toast.makeText(mContext, "게임종료", Toast.LENGTH_SHORT).show()
                             binding.imgPlayRoomRollDice.isClickable = false
+                            binding.imgPlayRoomRollDice.isEnabled = false
                             binding.imgPlayRoomRollDice.pauseAnimation()
                             binding.imgPlayRoomRollDice.progress = 0.97f
-                        }
 
+                            getUserScoreData(playerDataList)
+                        }
                     }
                 }
             }
@@ -243,10 +244,11 @@ class FragmentPlayRoom : Fragment() {
             }
     }
 
+    @SuppressLint("SetTextI18n")
     private fun scoreBoardNameInit(playerDataList: Map<String, *>) {
         if(boardFirstNameChecker) {
             val user = playerDataList[currentUid] as Map<String, *>
-            binding.includeScoreBoard.textScoreBoard1PlayerName.text = user["nickname"].toString()
+            binding.textScoreBoard1PlayerName.text = "Player: ${user["nickname"]}"
             boardFirstNameChecker = false
         }
     }
@@ -267,7 +269,7 @@ class FragmentPlayRoom : Fragment() {
     }
 
     private fun setRcViewPlayer(playerDataList: Map<String, *>) {
-        rcPlayerView.adapter = PlayRoomPlayerAdapter(playerDataList, binding.includeScoreBoard, db, roomDocId, mContext)
+        rcPlayerView.adapter = PlayRoomPlayerAdapter(playerDataList, binding.includeScoreBoard, db, roomDocId, mContext, binding.textScoreBoard1PlayerName)
     }
 
     private fun setCurrentPlayerNotice(roomData: RoomData, playerDataList: Map<String, *>) {
@@ -296,11 +298,10 @@ class FragmentPlayRoom : Fragment() {
     private fun setRollBtnControl() {
         if (myTurnState) {
             binding.imgPlayRoomRollDice.isClickable = true
-            binding.imgPlayRoomRollDice.playAnimation()
+            binding.imgPlayRoomRollDice.isEnabled = true
         } else {
             binding.imgPlayRoomRollDice.isClickable = false
-            binding.imgPlayRoomRollDice.pauseAnimation()
-            binding.imgPlayRoomRollDice.progress = 0.97f
+            binding.imgPlayRoomRollDice.isEnabled = false
         }
     }
 
@@ -497,5 +498,45 @@ class FragmentPlayRoom : Fragment() {
             }
         }
     }
+
+    private fun getUserScoreData(playerDataList: Map<String, *>) {
+        db.collection("room_score_board").document(roomDocId)
+            .get()
+            .addOnSuccessListener {
+                val data = it.data
+                if(data != null) {
+
+                    binding.rcPlayRoomTotalScore.visibility = View.VISIBLE
+
+                    val nickNameMap = mutableMapOf<String, String>()
+                    for((key, value ) in playerDataList) {
+                        val castValue = value as Map<String, String>
+                        nickNameMap[key] = castValue["nickname"].toString()
+                    }
+
+                    val scoreRank = mutableListOf<Int>()
+                    for((_, value) in data) {
+                        val castValue = value as Map<String, Int>
+                        scoreRank.add(castValue["total"]!!.toInt())
+                    }
+
+                    val setScoreRank = scoreRank.toSet().toList().sortedDescending()
+                    val rankUserMap = mutableMapOf<String, List<Int>>()
+                    for((key, value) in data) {
+                        val castValue = value as Map<String, Int>
+                        val total = castValue["total"]!!.toInt()
+                        val rank = setScoreRank.indexOf(total) + 1
+                        rankUserMap[nickNameMap[key].toString()] = listOf(rank, total)
+                    }
+
+                    val sortedRankUserMap = rankUserMap.entries
+                        .sortedBy { num -> num.value[0] }
+                        .associateTo(mutableMapOf()) {number -> number.key to number.value}
+
+                    binding.rcPlayRoomTotalScore.adapter = TotalScoreAdapter(sortedRankUserMap)
+                }
+            }
+    }
+
 
 }

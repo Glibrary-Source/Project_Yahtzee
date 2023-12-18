@@ -13,14 +13,14 @@
         android:orientation="vertical"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginStart="48dp"
-        android:layout_marginEnd="48dp"
+        android:layout_marginStart="52dp"
+        android:layout_marginEnd="52dp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toBottomOf="parent">
 
-        <LinearLayout
+        <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/linear_create_room"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -34,28 +34,35 @@
             app:layout_constraintTop_toTopOf="parent">
 
             <com.airbnb.lottie.LottieAnimationView
+                android:id="@+id/lottie_menu_create"
                 android:layout_width="52dp"
                 android:layout_height="52dp"
                 android:layout_gravity="start"
                 app:lottie_rawRes="@raw/dice_roll_animation"
                 app:lottie_autoPlay="true"
                 app:lottie_loop="true"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
                 tools:ignore="ContentDescription" />
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="8dp"
-                android:fontFamily="@font/pattaya"
+                style="@style/MyTextViewStyle"
+                android:textSize="32dp"
+                android:text="@string/fragment_menu_create_room"
+                android:textColor="@color/white"
                 android:layout_gravity="center"
                 android:letterSpacing="0.1"
                 android:maxLines="1"
-                android:text="@string/fragment_menu_create_room"
-                android:textColor="@color/white"
-                android:textSize="32dp" />
-        </LinearLayout>
+                app:layout_constraintStart_toEndOf="@id/lottie_menu_create"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"/>
+        </androidx.constraintlayout.widget.ConstraintLayout>
 
-        <LinearLayout
+        <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/linear_room_list"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -69,26 +76,34 @@
             app:layout_constraintTop_toBottomOf="@id/linear_create_room">
 
             <com.airbnb.lottie.LottieAnimationView
+                android:id="@+id/lottie_menu_room_list"
                 android:layout_width="52dp"
                 android:layout_height="52dp"
                 android:layout_marginEnd="8dp"
                 app:lottie_rawRes="@raw/icon_list_animation"
                 app:lottie_autoPlay="true"
-                app:lottie_loop="true" />
+                app:lottie_loop="true"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent" />
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="12dp"
-                android:fontFamily="@font/pattaya"
+                style="@style/MyTextViewStyle"
                 android:layout_gravity="center"
                 android:letterSpacing="0.1"
                 android:text="@string/fragment_menu_room_list"
                 android:textColor="@color/white"
-                android:textSize="32dp" />
-        </LinearLayout>
+                android:textSize="32dp"
+                app:layout_constraintStart_toEndOf="@id/lottie_menu_room_list"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"/>
+        </androidx.constraintlayout.widget.ConstraintLayout>
 
-        <LinearLayout
+        <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/linear_my_profile"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -103,24 +118,33 @@
             app:layout_constraintTop_toBottomOf="@id/linear_room_list">
 
             <com.airbnb.lottie.LottieAnimationView
+                android:id="@+id/lottie_menu_profile"
                 android:layout_width="52dp"
                 android:layout_height="52dp"
                 android:layout_marginEnd="8dp"
+                android:padding="2dp"
                 app:lottie_rawRes="@raw/icon_profile_animation"
                 app:lottie_autoPlay="true"
                 app:lottie_loop="true"
-                tools:ignore="ContentDescription" />
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                />
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:fontFamily="@font/pattaya"
+                style="@style/MyTextViewStyle"
                 android:text="@string/fragment_menu_my_profile"
                 android:layout_marginStart="8dp"
                 android:letterSpacing="0.1"
                 android:layout_gravity="center"
                 android:textColor="@color/white"
-                android:textSize="32dp" />
-        </LinearLayout>
+                android:textSize="32dp"
+                app:layout_constraintStart_toEndOf="@id/lottie_menu_profile"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"/>
+        </androidx.constraintlayout.widget.ConstraintLayout>
     </LinearLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

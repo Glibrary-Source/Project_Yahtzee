@@ -1,7 +1,6 @@
 package com.twproject.projectyahtzee.view.main.adapter
 
 import android.annotation.SuppressLint
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -11,7 +10,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.twproject.projectyahtzee.R
 
 class PlayerListAdapter(
-    private val roomData: Map<String,Any>
+    private val playerDataMap: Map<String,Any>
 ): RecyclerView.Adapter<PlayerListAdapter.ItemViewHolder>()  {
 
     inner class ItemViewHolder(view: View) : RecyclerView.ViewHolder(view) {
@@ -29,7 +28,7 @@ class PlayerListAdapter(
 
     @SuppressLint("SetTextI18n")
     override fun onBindViewHolder(holder: ItemViewHolder, position: Int) {
-        val item = roomData.values.toList()[position]
+        val item = playerDataMap.values.toList()[position]
         val castItem = item as Map<*,*>
         holder.playerNumber.text = "${position + 1}."
         holder.playerName.text = castItem["nickname"].toString()
@@ -37,6 +36,6 @@ class PlayerListAdapter(
     }
 
     override fun getItemCount(): Int {
-        return roomData.size
+        return playerDataMap.size
     }
 }

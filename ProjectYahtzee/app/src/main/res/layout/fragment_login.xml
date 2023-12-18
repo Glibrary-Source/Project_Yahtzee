@@ -24,14 +24,14 @@
             android:id="@+id/img_icon_google"
             android:src="@drawable/icon_login_google"
             android:layout_marginEnd="16dp"
-            android:layout_width="40dp"
-            android:layout_height="40dp"/>
+            android:layout_width="36dp"
+            android:layout_height="36dp"/>
 
         <TextView
             android:id="@+id/text_google_login"
             android:text="google"
             android:textColor="#FFFFFF"
-            android:fontFamily="@font/pattaya"
+            style="@style/MyTextViewStyle"
             android:letterSpacing="0.1"
             android:textSize="32dp"
             android:layout_width="wrap_content"

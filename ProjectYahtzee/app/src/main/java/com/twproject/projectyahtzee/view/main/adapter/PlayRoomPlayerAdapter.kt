@@ -12,6 +12,7 @@ import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.google.firebase.firestore.FirebaseFirestore
 import com.twproject.projectyahtzee.R
+import com.twproject.projectyahtzee.databinding.FragmentPlayRoomBinding
 import com.twproject.projectyahtzee.databinding.ScoreBoardBinding
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers.IO
@@ -25,7 +26,8 @@ class PlayRoomPlayerAdapter(
     private val binding: ScoreBoardBinding,
     private val db: FirebaseFirestore,
     private val roomDocId: String,
-    private val context: Context
+    private val context: Context,
+    private val scoreBoardPlayerNameView: TextView
 ) : RecyclerView.Adapter<PlayRoomPlayerAdapter.ItemViewHolder>() {
 
     inner class ItemViewHolder(view: View) : RecyclerView.ViewHolder(view) {
@@ -75,9 +77,10 @@ class PlayRoomPlayerAdapter(
         }
     }
 
+    @SuppressLint("SetTextI18n")
     private suspend fun viewScore(score: Map<String, *>, userNickName: String) {
         withContext(Main){
-            binding.textScoreBoard1PlayerName.text = userNickName
+            scoreBoardPlayerNameView.text = "Player: $userNickName"
             setView(binding.textScoreBoard1OnesPoint, score["ones"].toString())
             setView(binding.textScoreBoard1TwosPoint, score["twos"].toString())
             setView(binding.textScoreBoard1ThreesPoint, score["threes"].toString())

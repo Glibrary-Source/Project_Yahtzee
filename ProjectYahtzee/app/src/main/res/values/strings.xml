@@ -12,7 +12,7 @@
     <string name="edit_room_name_en">write room name</string>
     <string name="create_title_en">Create Room</string>
     <string name="create_room_name_hint_en">Room name</string>
-    <string name="create_room_num_hint_en">Room num</string>
+    <string name="create_room_num_hint_en">Player num</string>
     <string name="room_list_en">Room List</string>
     <string name="btn_ready_en">Ready</string>
     <string name="btn_exit_room">Exit</string>
@@ -34,4 +34,5 @@
     <string name="fragment_menu_create_room">Create Room</string>
     <string name="fragment_menu_room_list">Room List</string>
     <string name="fragment_menu_my_profile">My Profile</string>
+    <string name="text_no_room">No Room</string>
 </resources>

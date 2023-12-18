@@ -14,7 +14,7 @@ object BackPressCallBackManager {
                 if (backPressTime + 3000 > System.currentTimeMillis()) {
                     activity.finish()
                 } else {
-                    Toast.makeText(context , "한번 더 뒤로가기 버튼을 누르면 종료됩니다", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(context , "Press the back button once more to exit.", Toast.LENGTH_SHORT).show()
                 }
                 backPressTime = System.currentTimeMillis()
             }

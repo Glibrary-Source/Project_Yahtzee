@@ -1,6 +1,7 @@
 package com.twproject.projectyahtzee.view.main
 
 import android.content.Context
+import android.opengl.Visibility
 import android.os.Bundle
 import android.util.Log
 import androidx.fragment.app.Fragment
@@ -51,7 +52,10 @@ class FragmentRoomList : Fragment() {
         rcView = binding.rcRoomList
         rcView.setHasFixedSize(true)
 
+        getRoomList()
+
         binding.btnRefresh.setOnClickListener {
+            binding.btnRefresh.playAnimation()
             getRoomList()
         }
 
@@ -65,7 +69,7 @@ class FragmentRoomList : Fragment() {
                 .addOnSuccessListener {
                     val data = it.data
                     if (data == null) {
-                        Log.d("DataTest", "noExiste")
+                        Log.d("DataTest", "No Existed")
                     } else {
                         userProfile = it.toObject(UserProfileData::class.java)!!
                         setPlayerProfile()
@@ -105,6 +109,14 @@ class FragmentRoomList : Fragment() {
                 rcView.adapter = RoomLIstAdapter(
                     roomDataList, db, playerData, currentUid, mContext
                 )
+                if(roomDataList.isEmpty()) {
+                    binding.textNoRoom.bringToFront()
+                    binding.textNoRoom.invalidate()
+                    binding.textNoRoom.visibility = View.VISIBLE
+                } else {
+                    Log.d("testYes", "YesList")
+                    binding.textNoRoom.visibility = View.GONE
+                }
             }
     }
 }
