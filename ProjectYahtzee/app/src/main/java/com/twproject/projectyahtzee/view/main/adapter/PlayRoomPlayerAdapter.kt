@@ -12,8 +12,8 @@ import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.google.firebase.firestore.FirebaseFirestore
 import com.twproject.projectyahtzee.R
-import com.twproject.projectyahtzee.databinding.FragmentPlayRoomBinding
 import com.twproject.projectyahtzee.databinding.ScoreBoardBinding
+import com.twproject.projectyahtzee.vbutils.onThrottleClick
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.Dispatchers.Main
@@ -48,7 +48,7 @@ class PlayRoomPlayerAdapter(
         val castItem = itemValues as Map<*, *>
         val userNickName = castItem["nickname"].toString()
         holder.playerName.text = castItem["nickname"].toString()
-        holder.playerLinear.setOnClickListener {
+        holder.playerLinear.onThrottleClick {
             getUserData(roomDocId, itemUid, userNickName)
         }
     }

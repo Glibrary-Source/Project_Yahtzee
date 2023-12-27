@@ -54,6 +54,7 @@ class FragmentRoomList : Fragment() {
 
         getRoomList()
 
+        binding.btnRefresh.bringToFront()
         binding.btnRefresh.setOnClickListener {
             binding.btnRefresh.playAnimation()
             getRoomList()
@@ -110,11 +111,9 @@ class FragmentRoomList : Fragment() {
                     roomDataList, db, playerData, currentUid, mContext
                 )
                 if(roomDataList.isEmpty()) {
-                    binding.textNoRoom.bringToFront()
                     binding.textNoRoom.invalidate()
                     binding.textNoRoom.visibility = View.VISIBLE
                 } else {
-                    Log.d("testYes", "YesList")
                     binding.textNoRoom.visibility = View.GONE
                 }
             }

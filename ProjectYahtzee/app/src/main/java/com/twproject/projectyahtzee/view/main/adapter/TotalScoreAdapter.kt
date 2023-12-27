@@ -27,11 +27,20 @@ class TotalScoreAdapter(
     override fun onBindViewHolder(holder: ItemViewHolder, position: Int) {
         val itemNickName = userData.keys.toList()[position]
         val itemScore = userData.values.toList()[position]
-        holder.playerNickName.text = "${itemScore[0]} $itemNickName"
+        holder.playerNickName.text = "${numberTest(itemScore[0])} $itemNickName"
         holder.playerTotalScore.text = itemScore[1].toString()
     }
 
     override fun getItemCount(): Int {
         return userData.size
+    }
+
+    private fun numberTest(itemScore: Int) : String{
+        return when(itemScore) {
+            1 -> { "1st." }
+            2 -> { "2nd." }
+            3 -> { "3rd." }
+            else -> { "$itemScore." }
+        }
     }
 }

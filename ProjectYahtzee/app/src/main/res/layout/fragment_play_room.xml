@@ -68,6 +68,16 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/rc_play_room_extend_player"/>
 
+            <ImageButton
+                android:id="@+id/btn_exit_room"
+                android:layout_width="56dp"
+                android:layout_height="56dp"
+                android:src="@drawable/icon_room_out"
+                android:scaleType="centerCrop"
+                android:backgroundTint="@color/colorPrimary"
+                app:layout_constraintEnd_toEndOf="@+id/cs_play_room_player"
+                app:layout_constraintTop_toTopOf="@id/cs_play_room_player"/>
+
         </androidx.constraintlayout.widget.ConstraintLayout>
 
         <TextView
@@ -203,6 +213,7 @@
                     android:id="@+id/img_play_room_roll_dice"
                     android:layout_width="63dp"
                     android:layout_height="63dp"
+                    android:layout_gravity="center"
                     app:lottie_rawRes="@raw/dice_roll_animation2" />
             </FrameLayout>
         </androidx.constraintlayout.widget.ConstraintLayout>
@@ -217,6 +228,5 @@
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent" />
-
     </androidx.constraintlayout.widget.ConstraintLayout>
 </ScrollView>

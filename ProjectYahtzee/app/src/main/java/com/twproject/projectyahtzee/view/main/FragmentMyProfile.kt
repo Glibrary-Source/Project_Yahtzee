@@ -67,7 +67,7 @@ class FragmentMyProfile : Fragment() {
             ButtonAnimation().startAnimation(it, animScale)
             if(binding.editUserNickname.text.toString().isBlank()) {
                 Toast.makeText(mContext, "Check text", Toast.LENGTH_SHORT).show()
-            } else {
+            } else  {
                 changeNickName(binding.editUserNickname.text.trim().toString())
             }
         }

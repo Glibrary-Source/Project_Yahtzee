@@ -14,6 +14,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.SetOptions
 import com.twproject.projectyahtzee.R
+import com.twproject.projectyahtzee.vbutils.onThrottleClick
 import com.twproject.projectyahtzee.view.main.FragmentRoomListDirections
 import com.twproject.projectyahtzee.view.main.datamodel.PlayerData
 import com.twproject.projectyahtzee.view.main.datamodel.RoomData
@@ -46,7 +47,7 @@ class RoomLIstAdapter(
         holder.itemNumber.text = "${item.room_number}."
         holder.itemTitle.text = item.room_name
         holder.itemPlayer.text = "${playerNum}/${item.room_max_num}"
-        holder.itemCsView.setOnClickListener {
+        holder.itemCsView.onThrottleClick {
             roomExistCheck(item, it)
         }
     }

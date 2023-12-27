@@ -14,6 +14,7 @@ import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.RecyclerView
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.ListenerRegistration
 import com.google.firebase.firestore.SetOptions
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
@@ -30,6 +31,8 @@ class FragmentReadyRoom : Fragment() {
     private lateinit var rcView: RecyclerView
     private lateinit var callback: OnBackPressedCallback
     private lateinit var activity: FragmentActivity
+
+    private var roomListRefreshListenerRegistration: ListenerRegistration? = null
 
     private val roomData by navArgs<FragmentReadyRoomArgs>()
     private var currentUid = FirebaseAuth.getInstance().uid.toString()
@@ -73,7 +76,7 @@ class FragmentReadyRoom : Fragment() {
     }
 
     private fun roomRefreshListener() {
-        db.collection("room_list").document(roomDocId)
+        roomListRefreshListenerRegistration = db.collection("room_list").document(roomDocId)
             .addSnapshotListener { value, _ ->
                 if (value == null) {
                     Log.d("testRoom", "data failed")
@@ -111,10 +114,12 @@ class FragmentReadyRoom : Fragment() {
 
     private fun checkAllReady(playerDataList: Map<String, Any>, roomData: RoomData) {
         val readyList = mutableListOf<String>()
+
         for ((_, value) in playerDataList) {
             val player = value as Map<String, Any>
             readyList.add(player["waitstate"].toString())
         }
+
         if (!readyList.contains("wait") && currentUid == roomData.room_manager && readyList.size > 1) {
             binding.frameBtnStart.visibility = View.VISIBLE
             setStartBtn()
@@ -146,6 +151,7 @@ class FragmentReadyRoom : Fragment() {
             val action =
                 FragmentReadyRoomDirections.actionFragmentReadyRoomToFragmentPlayRoom(roomDocId)
             findNavController().navigate(action)
+            roomRefreshListenerStop()
         }
     }
 
@@ -167,10 +173,8 @@ class FragmentReadyRoom : Fragment() {
                 it.remove(currentUid)
 
                 if (it.isEmpty()) {
-                    // 방이 비어 있으면 삭제
                     transaction.delete(roomRef)
                 } else {
-                    // player_data 필드 업데이트
                     transaction.update(roomRef, "player_data", it)
                 }
             }
@@ -180,7 +184,6 @@ class FragmentReadyRoom : Fragment() {
             val action = FragmentReadyRoomDirections.actionFragmentReadyRoomToFragmentRoomList()
             findNavController().navigate(action)
         }.addOnFailureListener { e ->
-            // 실패 처리
             Log.e("exitPlayer", "트랜잭션 실패: $e")
         }
     }
@@ -190,7 +193,7 @@ class FragmentReadyRoom : Fragment() {
             val manager = mapOf(
                 "room_manager" to currentUid
             )
-            db.collection("room_list").document(roomDocId)
+            db.collection(" room_list").document(roomDocId)
                 .update(manager)
         }
     }
@@ -208,6 +211,10 @@ class FragmentReadyRoom : Fragment() {
             db.collection("room_list").document(roomDocId)
                 .set(player, SetOptions.merge())
         }
+    }
+
+    private fun roomRefreshListenerStop() {
+        roomListRefreshListenerRegistration?.remove()
     }
 
 }

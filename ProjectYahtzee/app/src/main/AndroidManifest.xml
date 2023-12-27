@@ -14,9 +14,8 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.ProjectYahtzee"
         tools:targetApi="31">
-        <service android:name=".vbutils.MyService"
-            android:enabled="true"
-            android:exported="false" />
+        <service android:name=".PlayerDeleteService"
+            android:stopWithTask="false" />
         <activity
             android:name=".view.splash.SplashActivity"
             android:exported="true">
@@ -31,5 +30,4 @@
             android:name=".view.main.MainActivity"
             android:exported="false"/>
     </application>
-
 </manifest>

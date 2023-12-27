@@ -7,6 +7,18 @@
     android:background="@color/colorPrimary"
     tools:context=".view.main.FragmentRoomList">
 
+    <com.airbnb.lottie.LottieAnimationView
+        android:id="@+id/btn_refresh"
+        android:src="@drawable/btn_reload"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:layout_margin="8dp"
+        android:background="@drawable/default_icon_refresh_bg"
+        app:lottie_colorFilter="@color/white"
+        app:lottie_rawRes="@raw/icon_refresh"
+        app:layout_constraintEnd_toEndOf="@id/cs_play_room_frame"
+        app:layout_constraintBottom_toBottomOf="@id/cs_play_room_frame"/>
+
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/frame_room_title"
         android:layout_width="match_parent"
@@ -14,7 +26,7 @@
         app:layout_constraintVertical_weight="5"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toTopOf="@id/rc_room_list">
+        app:layout_constraintBottom_toTopOf="@id/cs_play_room_frame">
 
         <TextView
             android:id="@+id/text_room_list_title"
@@ -31,41 +43,43 @@
             style="@style/MyTextViewStyle"/>
     </androidx.constraintlayout.widget.ConstraintLayout>
 
-    <com.airbnb.lottie.LottieAnimationView
-        android:id="@+id/btn_refresh"
-        android:src="@drawable/btn_reload"
-        android:layout_width="40dp"
-        android:layout_height="40dp"
-        app:lottie_colorFilter="@color/white"
-        app:lottie_rawRes="@raw/icon_refresh"
-        app:layout_constraintEnd_toEndOf="@id/rc_room_list"
-        app:layout_constraintBottom_toTopOf="@id/rc_room_list"/>
-
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/rc_room_list"
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/cs_play_room_frame"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_marginStart="16dp"
         android:layout_marginEnd="16dp"
         android:layout_marginBottom="16dp"
-        android:elevation="10dp"
-        android:padding="8dp"
         android:background="@drawable/default_profile_bg"
-        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+        android:animateLayoutChanges="true"
         app:layout_constraintVertical_weight="24"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/frame_room_title"
-        app:layout_constraintBottom_toBottomOf="parent"/>
+        app:layout_constraintBottom_toBottomOf="parent">
 
-    <TextView
-        android:id="@+id/text_no_room"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/text_no_room"
-        android:textColor="@color/white"
-        android:textSize="44dp"
-        app:layout_constraintStart_toStartOf="@id/rc_room_list"
-        app:layout_constraintTop_toTopOf="@id/rc_room_list"
-        app:layout_constraintEnd_toEndOf="@id/rc_room_list"
-        app:layout_constraintBottom_toBottomOf="@id/rc_room_list"/>
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rc_room_list"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:elevation="10dp"
+            android:padding="8dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
+
+        <TextView
+            android:id="@+id/text_no_room"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/text_no_room"
+            android:textColor="@color/white"
+            style="@style/MyTextViewStyle"
+            android:textSize="40dp"
+            android:visibility="gone"
+            app:layout_constraintStart_toStartOf="@id/rc_room_list"
+            app:layout_constraintTop_toTopOf="@id/rc_room_list"
+            app:layout_constraintEnd_toEndOf="@id/rc_room_list"
+            app:layout_constraintBottom_toBottomOf="@id/rc_room_list"/>
+    </androidx.constraintlayout.widget.ConstraintLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

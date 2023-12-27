@@ -2,6 +2,7 @@ package com.twproject.projectyahtzee.view.main
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.content.Intent
 import android.graphics.Color
 import android.graphics.PorterDuff
 import android.media.MediaPlayer
@@ -11,16 +12,24 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.animation.AlphaAnimation
 import android.widget.ImageView
 import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
+import androidx.appcompat.app.AlertDialog
+import androidx.lifecycle.lifecycleScope
+import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FieldValue
+import com.google.firebase.firestore.ListenerRegistration
+import com.google.firebase.firestore.SetOptions
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import com.twproject.banyeomiji.vbutility.BackPressCallBackManager
+import com.twproject.projectyahtzee.PlayerDeleteService
 import com.twproject.projectyahtzee.R
 import com.twproject.projectyahtzee.databinding.FragmentPlayRoomBinding
 import com.twproject.projectyahtzee.vbutils.onThrottleClick
@@ -33,8 +42,12 @@ import com.twproject.projectyahtzee.view.main.util.ScoreBoard
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.Dispatchers.Main
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import java.util.concurrent.Executors
+import java.util.concurrent.TimeUnit
 
 class FragmentPlayRoom : Fragment() {
 
@@ -53,6 +66,11 @@ class FragmentPlayRoom : Fragment() {
 
     private lateinit var scoreBoard: ScoreBoard
 
+    private var roomListRefreshListenerRegistration: ListenerRegistration? = null
+    private var roomTurnRefreshListenerRegistration: ListenerRegistration? = null
+    private var roomDiceRefreshListenerRegistration: ListenerRegistration? = null
+
+
     private var dice1Clicked = false
     private var dice2Clicked = false
     private var dice3Clicked = false
@@ -66,6 +84,13 @@ class FragmentPlayRoom : Fragment() {
     private var boardFirstNameChecker = true
     private val roomData by navArgs<FragmentPlayRoomArgs>()
     private var currentUid = FirebaseAuth.getInstance().uid.toString()
+    private val fadeIn01 = AlphaAnimation(0.3f, 1.0f).apply {
+        duration = 2000
+        repeatCount = -1
+    }
+
+    private val startTime = 0
+    private val TAG = "testLifeCL"
     val db = Firebase.firestore
 
     override fun onAttach(context: Context) {
@@ -80,6 +105,14 @@ class FragmentPlayRoom : Fragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         roomDocId = roomData.roomId
+        setWaitState()
+
+        val serviceIntent = Intent(mContext, PlayerDeleteService::class.java).apply {
+            putExtra("DOC_ID_EXTRA", roomDocId)
+            putExtra("CURRENT_UID_EXTRA", currentUid)
+        }
+
+        activity.startService(serviceIntent)
     }
 
     override fun onCreateView(
@@ -87,7 +120,8 @@ class FragmentPlayRoom : Fragment() {
         savedInstanceState: Bundle?
     ): View {
         binding = FragmentPlayRoomBinding.inflate(inflater)
-        scoreBoard = ScoreBoard(binding.includeScoreBoard, mContext, binding, db, roomDocId,currentUid)
+        scoreBoard =
+            ScoreBoard(binding.includeScoreBoard, mContext, binding, db, roomDocId, currentUid)
         binding.imgPlayRoomRollDice.progress = 0.97f
 
         dice1 = Dice(binding.imgPlayDice1)
@@ -99,9 +133,13 @@ class FragmentPlayRoom : Fragment() {
         rcPlayerView = binding.rcPlayRoomExtendPlayer
         rcPlayerView.layoutManager = GridLayoutManager(mContext, 4)
 
-        roomRefreshListener()
+        roomListRefreshListener()
         roomTurnRefreshListener()
         diceRefreshListener()
+
+        binding.btnExitRoom.setOnClickListener {
+            exitDialog()
+        }
 
         binding.imgPlayRoomPlayer.setOnClickListener {
             playerVisibleControl()
@@ -119,8 +157,9 @@ class FragmentPlayRoom : Fragment() {
             }
 
             binding.imgPlayRoomRollDice.playAnimation()
+
             if (diceRollCount <= 2) {
-                diceRollCount ++
+                diceRollCount++
             } else {
                 binding.imgPlayRoomRollDice.isClickable = false
                 binding.imgPlayRoomRollDice.isEnabled = false
@@ -129,14 +168,25 @@ class FragmentPlayRoom : Fragment() {
 
         viewOnClick()
 
+        Log.d(TAG, "onCreateView")
         return binding.root
+    }
+
+    override fun onPause() {
+        super.onPause()
+        Log.d(TAG, "onPause")
+    }
+
+    override fun onResume() {
+        super.onResume()
+        Log.d(TAG, "onResume")
+
     }
 
     private fun playDiceSound() {
         val mediaPlayer = MediaPlayer.create(mContext, R.raw.roll_dice)
         mediaPlayer.start()
     }
-
 
     private fun playerVisibleControl() {
         if (binding.rcPlayRoomExtendPlayer.visibility == View.VISIBLE) {
@@ -146,8 +196,8 @@ class FragmentPlayRoom : Fragment() {
         }
     }
 
-    private fun roomRefreshListener() {
-        db.collection("room_list").document(roomDocId)
+    private fun roomListRefreshListener() {
+        roomListRefreshListenerRegistration = db.collection("room_list").document(roomDocId)
             .addSnapshotListener { value, _ ->
                 if (value == null) {
                     Log.d("testRoom", "data failed")
@@ -170,13 +220,14 @@ class FragmentPlayRoom : Fragment() {
 
                     setRcViewPlayer(playerDataList)
                     setCurrentPlayerNotice(roomData, playerDataList)
+                    userOutSetRoomTurn(roomData)
                 }
             }
     }
 
     @SuppressLint("SetTextI18n")
     private fun roomTurnRefreshListener() {
-        db.collection("room_turn").document(roomDocId)
+        roomTurnRefreshListenerRegistration = db.collection("room_turn").document(roomDocId)
             .addSnapshotListener { value, _ ->
                 if (value == null) {
                     Log.d("testRoom", "data failed")
@@ -192,14 +243,20 @@ class FragmentPlayRoom : Fragment() {
                         setRollBtnControl()
 
                         val roomCount = value.data!!["room_total_turn"].toString().toInt()
-                        if(roomCount >= 13) {
-                            Toast.makeText(mContext, "게임종료", Toast.LENGTH_SHORT).show()
+                        if (roomCount >= 13) {
+                            Toast.makeText(mContext, "Game Over", Toast.LENGTH_SHORT).show()
                             binding.imgPlayRoomRollDice.isClickable = false
                             binding.imgPlayRoomRollDice.isEnabled = false
                             binding.imgPlayRoomRollDice.pauseAnimation()
                             binding.imgPlayRoomRollDice.progress = 0.97f
+                            binding.imgPlayRoomRollDice.clearAnimation()
 
                             getUserScoreData(playerDataList)
+
+                            try {
+                                endGame()
+                            } catch (_: Exception) {
+                            }
                         }
                     }
                 }
@@ -207,7 +264,7 @@ class FragmentPlayRoom : Fragment() {
     }
 
     private fun diceRefreshListener() {
-        db.collection("room_dice_num").document(roomDocId)
+        roomDiceRefreshListenerRegistration = db.collection("room_dice_num").document(roomDocId)
             .addSnapshotListener { value, _ ->
                 if (value == null) {
                     Log.d("testRoom", "data failed")
@@ -244,9 +301,26 @@ class FragmentPlayRoom : Fragment() {
             }
     }
 
+//    private fun onPauseRefreshListener() {
+//        db.collection("room_on_pause").document(roomDocId)
+//            .addSnapshotListener { value, _ ->
+//                if (value != null) {
+//                    val pauseData = value.data
+//                    if(pauseData != null) {
+//                        for((key, user) in pauseData) {
+//                            val userState = user as Boolean
+//                            if(userState) {
+//
+//                            }
+//                        }
+//                    }
+//                }
+//            }
+//    }
+
     @SuppressLint("SetTextI18n")
     private fun scoreBoardNameInit(playerDataList: Map<String, *>) {
-        if(boardFirstNameChecker) {
+        if (boardFirstNameChecker) {
             val user = playerDataList[currentUid] as Map<String, *>
             binding.textScoreBoard1PlayerName.text = "Player: ${user["nickname"]}"
             boardFirstNameChecker = false
@@ -269,7 +343,14 @@ class FragmentPlayRoom : Fragment() {
     }
 
     private fun setRcViewPlayer(playerDataList: Map<String, *>) {
-        rcPlayerView.adapter = PlayRoomPlayerAdapter(playerDataList, binding.includeScoreBoard, db, roomDocId, mContext, binding.textScoreBoard1PlayerName)
+        rcPlayerView.adapter = PlayRoomPlayerAdapter(
+            playerDataList,
+            binding.includeScoreBoard,
+            db,
+            roomDocId,
+            mContext,
+            binding.textScoreBoard1PlayerName
+        )
     }
 
     private fun setCurrentPlayerNotice(roomData: RoomData, playerDataList: Map<String, *>) {
@@ -299,9 +380,11 @@ class FragmentPlayRoom : Fragment() {
         if (myTurnState) {
             binding.imgPlayRoomRollDice.isClickable = true
             binding.imgPlayRoomRollDice.isEnabled = true
+            binding.imgPlayRoomRollDice.startAnimation(fadeIn01)
         } else {
             binding.imgPlayRoomRollDice.isClickable = false
             binding.imgPlayRoomRollDice.isEnabled = false
+            binding.imgPlayRoomRollDice.clearAnimation()
         }
     }
 
@@ -316,24 +399,24 @@ class FragmentPlayRoom : Fragment() {
     private fun diceRoll() {
         val diceList = mutableListOf<Int>()
 
-        if(dice1Clicked) {
+        if (dice1Clicked) {
             dice1.roll()
             dice1.animation.start()
         }
 
-        if(dice2Clicked) {
+        if (dice2Clicked) {
             dice2.roll()
             dice2.animation.start()
         }
-        if(dice3Clicked) {
+        if (dice3Clicked) {
             dice3.roll()
             dice3.animation.start()
         }
-        if(dice4Clicked) {
+        if (dice4Clicked) {
             dice4.roll()
             dice4.animation.start()
         }
-        if(dice5Clicked) {
+        if (dice5Clicked) {
             dice5.roll()
             dice5.animation.start()
         }
@@ -420,7 +503,7 @@ class FragmentPlayRoom : Fragment() {
                     if (data != null) {
                         val totalTurn = data["room_total_turn"].toString().toInt()
 
-                        if(totalTurn == 14) {
+                        if (totalTurn == 14) {
                             Toast.makeText(mContext, "게임종료", Toast.LENGTH_SHORT).show()
                         } else {
                             val roomTotalTurn = mapOf(
@@ -437,60 +520,113 @@ class FragmentPlayRoom : Fragment() {
 
     private fun setDiceNotClick(view: ImageView, num: Int) {
         view.isClickable = false
-        when(num) {
-            1 -> { dice1Clicked = true }
-            2 -> { dice2Clicked = true }
-            3 -> { dice3Clicked = true }
-            4 -> { dice4Clicked = true }
-            5 -> { dice5Clicked = true }
+        when (num) {
+            1 -> {
+                dice1Clicked = true
+            }
+
+            2 -> {
+                dice2Clicked = true
+            }
+
+            3 -> {
+                dice3Clicked = true
+            }
+
+            4 -> {
+                dice4Clicked = true
+            }
+
+            5 -> {
+                dice5Clicked = true
+            }
         }
         view.setColorFilter(Color.WHITE, PorterDuff.Mode.MULTIPLY)
     }
 
     private fun viewOnClick() {
-        val diceViewList = listOf(binding.imgPlayDice1, binding.imgPlayDice2,binding.imgPlayDice3, binding.imgPlayDice4, binding.imgPlayDice5)
-        for((index, view) in diceViewList.withIndex()) {
+        val diceViewList = listOf(
+            binding.imgPlayDice1,
+            binding.imgPlayDice2,
+            binding.imgPlayDice3,
+            binding.imgPlayDice4,
+            binding.imgPlayDice5
+        )
+        for ((index, view) in diceViewList.withIndex()) {
             view.setOnClickListener {
-                when(index) {
+                when (index) {
                     0 -> {
                         dice1Clicked = !dice1Clicked
-                        Log.d("testDice", dice1Clicked.toString())
-                        if(dice1Clicked) {
-                            binding.imgPlayDice1.setColorFilter(Color.WHITE, PorterDuff.Mode.MULTIPLY)
+                        if (dice1Clicked) {
+                            binding.imgPlayDice1.setColorFilter(
+                                Color.WHITE,
+                                PorterDuff.Mode.MULTIPLY
+                            )
                         } else {
-                            binding.imgPlayDice1.setColorFilter(Color.parseColor("#BDBDBD"), PorterDuff.Mode.MULTIPLY)
+                            binding.imgPlayDice1.setColorFilter(
+                                Color.parseColor("#BDBDBD"),
+                                PorterDuff.Mode.MULTIPLY
+                            )
                         }
                     }
+
                     1 -> {
                         dice2Clicked = !dice2Clicked
-                        if(dice2Clicked) {
-                            binding.imgPlayDice2.setColorFilter(Color.WHITE, PorterDuff.Mode.MULTIPLY)
+                        if (dice2Clicked) {
+                            binding.imgPlayDice2.setColorFilter(
+                                Color.WHITE,
+                                PorterDuff.Mode.MULTIPLY
+                            )
                         } else {
-                            binding.imgPlayDice2.setColorFilter(Color.parseColor("#BDBDBD"), PorterDuff.Mode.MULTIPLY)
+                            binding.imgPlayDice2.setColorFilter(
+                                Color.parseColor("#BDBDBD"),
+                                PorterDuff.Mode.MULTIPLY
+                            )
                         }
                     }
+
                     2 -> {
                         dice3Clicked = !dice3Clicked
-                        if(dice3Clicked) {
-                            binding.imgPlayDice3.setColorFilter(Color.WHITE, PorterDuff.Mode.MULTIPLY)
+                        if (dice3Clicked) {
+                            binding.imgPlayDice3.setColorFilter(
+                                Color.WHITE,
+                                PorterDuff.Mode.MULTIPLY
+                            )
                         } else {
-                            binding.imgPlayDice3.setColorFilter(Color.parseColor("#BDBDBD"), PorterDuff.Mode.MULTIPLY)
+                            binding.imgPlayDice3.setColorFilter(
+                                Color.parseColor("#BDBDBD"),
+                                PorterDuff.Mode.MULTIPLY
+                            )
                         }
                     }
+
                     3 -> {
                         dice4Clicked = !dice4Clicked
-                        if(dice4Clicked) {
-                            binding.imgPlayDice4.setColorFilter(Color.WHITE, PorterDuff.Mode.MULTIPLY)
+                        if (dice4Clicked) {
+                            binding.imgPlayDice4.setColorFilter(
+                                Color.WHITE,
+                                PorterDuff.Mode.MULTIPLY
+                            )
                         } else {
-                            binding.imgPlayDice4.setColorFilter(Color.parseColor("#BDBDBD"), PorterDuff.Mode.MULTIPLY)
+                            binding.imgPlayDice4.setColorFilter(
+                                Color.parseColor("#BDBDBD"),
+                                PorterDuff.Mode.MULTIPLY
+                            )
                         }
                     }
+
                     4 -> {
                         dice5Clicked = !dice5Clicked
-                        if(dice5Clicked) {
-                            binding.imgPlayDice5.setColorFilter(Color.WHITE, PorterDuff.Mode.MULTIPLY)
+                        if (dice5Clicked) {
+                            binding.imgPlayDice5.setColorFilter(
+                                Color.WHITE,
+                                PorterDuff.Mode.MULTIPLY
+                            )
                         } else {
-                            binding.imgPlayDice5.setColorFilter(Color.parseColor("#BDBDBD"), PorterDuff.Mode.MULTIPLY)
+                            binding.imgPlayDice5.setColorFilter(
+                                Color.parseColor("#BDBDBD"),
+                                PorterDuff.Mode.MULTIPLY
+                            )
                         }
                     }
                 }
@@ -504,25 +640,25 @@ class FragmentPlayRoom : Fragment() {
             .get()
             .addOnSuccessListener {
                 val data = it.data
-                if(data != null) {
+                if (data != null) {
 
                     binding.rcPlayRoomTotalScore.visibility = View.VISIBLE
 
                     val nickNameMap = mutableMapOf<String, String>()
-                    for((key, value ) in playerDataList) {
+                    for ((key, value) in playerDataList) {
                         val castValue = value as Map<String, String>
                         nickNameMap[key] = castValue["nickname"].toString()
                     }
 
                     val scoreRank = mutableListOf<Int>()
-                    for((_, value) in data) {
+                    for ((_, value) in data) {
                         val castValue = value as Map<String, Int>
                         scoreRank.add(castValue["total"]!!.toInt())
                     }
 
                     val setScoreRank = scoreRank.toSet().toList().sortedDescending()
                     val rankUserMap = mutableMapOf<String, List<Int>>()
-                    for((key, value) in data) {
+                    for ((key, value) in data) {
                         val castValue = value as Map<String, Int>
                         val total = castValue["total"]!!.toInt()
                         val rank = setScoreRank.indexOf(total) + 1
@@ -531,12 +667,167 @@ class FragmentPlayRoom : Fragment() {
 
                     val sortedRankUserMap = rankUserMap.entries
                         .sortedBy { num -> num.value[0] }
-                        .associateTo(mutableMapOf()) {number -> number.key to number.value}
+                        .associateTo(mutableMapOf()) { number -> number.key to number.value }
 
                     binding.rcPlayRoomTotalScore.adapter = TotalScoreAdapter(sortedRankUserMap)
                 }
             }
     }
 
+    private fun setWaitState() {
+        lifecycleScope.launch {
+            delay(1500)
+            withContext(IO) {
+                val map = mapOf(
+                    "player_data" to mapOf(
+                        currentUid to mapOf(
+                            "waitstate" to "wait"
+                        )
+                    ),
+                    "room_state" to "wait"
+                )
+                db.collection("room_list").document(roomDocId)
+                    .set(map, SetOptions.merge())
+            }
+            withContext(Main) {
+
+            }
+        }
+    }
+
+    private fun endGame() {
+        lifecycleScope.launch(Main) {
+            Toast.makeText(
+                mContext,
+                "We'll be in the waiting room in 10 seconds",
+                Toast.LENGTH_LONG
+            ).show()
+            delay(10000)
+            clearRoomDB()
+            val action =
+                FragmentPlayRoomDirections.actionFragmentPlayRoomToFragmentReadyRoom(roomDocId)
+            findNavController().navigate(action)
+        }
+    }
+
+    private suspend fun clearRoomDB() {
+        withContext(IO) {
+            db.collection("room_dice_num").document(roomDocId)
+                .delete()
+            db.collection("room_score_board").document(roomDocId)
+                .delete()
+            db.collection("room_turn").document(roomDocId)
+                .delete()
+        }
+    }
+
+    private fun userOutSetRoomTurn(roomData: RoomData) {
+        if (roomData.room_player_list.contains(currentUid)) {
+            val turn = roomData.room_player_list.indexOf(currentUid) + 1
+            val player = mapOf(
+                "player_data" to mapOf(
+                    currentUid to mapOf(
+                        "playerturn" to turn
+                    )
+                )
+            )
+            db.collection("room_list").document(roomDocId)
+                .set(player, SetOptions.merge())
+
+            db.collection("room_turn").document(roomDocId)
+                .set(player, SetOptions.merge())
+        }
+    }
+
+    private fun exitDialog() {
+        val builder = AlertDialog.Builder(mContext)
+
+        builder.setTitle("Exit Room")
+        builder.setMessage("Are you sure you want to leave the room?")
+
+        builder.setNegativeButton("Cancel") { _, _ -> }
+        builder.setPositiveButton("Exit") { _, _ ->
+            val action = FragmentPlayRoomDirections.actionFragmentPlayRoomToFragmentRoomList()
+            findNavController().navigate(action)
+            playExitRoom()
+        }
+
+        val dialog = builder.create()
+        dialog.show()
+    }
+
+    private fun playExitRoom() {
+        roomListRefreshListenerRegistration?.remove()
+        roomTurnRefreshListenerRegistration?.remove()
+        roomDiceRefreshListenerRegistration?.remove()
+        CoroutineScope(IO).launch {
+            roomScoreBoardDelete(currentUid)
+            roomListDelete(currentUid)
+            roomTurnDelete(currentUid)
+        }
+    }
+
+    private fun roomScoreBoardDelete(uid: String) {
+        try {
+            val map = mapOf(
+                uid to FieldValue.delete()
+            )
+            db.collection("room_score_board").document(roomDocId)
+                .update(map)
+        } catch (_: Exception) {}
+    }
+
+    private fun roomListDelete(uid: String) {
+        try {
+            db.collection("room_list").document(roomDocId)
+                .get()
+                .addOnSuccessListener {
+                    val data = it.data
+                    if (data != null) {
+                        val userData = data["player_data"] as MutableMap<String, Any>
+                        val playerList = data["room_player_list"] as MutableList<String>
+                        userData.remove(uid)
+                        playerList.remove(uid)
+                        val updateMap = mapOf(
+                            "player_data" to userData,
+                            "room_player_list" to playerList
+                        )
+                        db.collection("room_list").document(roomDocId)
+                            .update(updateMap)
+                    }
+                }
+        } catch (_: Exception) {}
+    }
+
+    private fun roomTurnDelete(uid: String) {
+        try {
+            db.collection("room_turn").document(roomDocId)
+                .get()
+                .addOnSuccessListener {
+                    val data = it.data
+                    if (data != null) {
+                        val userData = data["player_data"] as MutableMap<String, Any>
+                        userData.remove(uid)
+                        val updateMap = mapOf(
+                            "player_data" to userData
+                        )
+                        db.collection("room_turn").document(roomDocId)
+                            .update(updateMap)
+                    }
+                }
+        } catch (_: Exception) {}
+    }
+
+    private fun setTimerData() {
+        val executor = Executors.newScheduledThreadPool(1)
+
+        executor.scheduleAtFixedRate(
+            {
+                val map = mapOf(currentUid to startTime)
+                db.collection("room_user_timestamp").document(roomDocId)
+                    .set(map)
+            }, 0, 60, TimeUnit.SECONDS
+        )
+    }
 
 }
