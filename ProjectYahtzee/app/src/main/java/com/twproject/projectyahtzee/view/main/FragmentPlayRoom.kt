@@ -1,8 +1,8 @@
 package com.twproject.projectyahtzee.view.main
 
+import android.animation.ValueAnimator
 import android.annotation.SuppressLint
 import android.content.Context
-import android.content.Intent
 import android.graphics.Color
 import android.graphics.PorterDuff
 import android.media.MediaPlayer
@@ -13,6 +13,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.animation.AlphaAnimation
+import android.view.animation.LinearInterpolator
 import android.widget.ImageView
 import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
@@ -29,7 +30,6 @@ import com.google.firebase.firestore.SetOptions
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import com.twproject.banyeomiji.vbutility.BackPressCallBackManager
-import com.twproject.projectyahtzee.PlayerDeleteService
 import com.twproject.projectyahtzee.R
 import com.twproject.projectyahtzee.databinding.FragmentPlayRoomBinding
 import com.twproject.projectyahtzee.vbutils.onThrottleClick
@@ -42,7 +42,6 @@ import com.twproject.projectyahtzee.view.main.util.ScoreBoard
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.Dispatchers.Main
-import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -89,7 +88,9 @@ class FragmentPlayRoom : Fragment() {
         repeatCount = -1
     }
 
-    private val startTime = 0
+    private val endTurnAnimator = endTurnAnimation()
+
+    private var startTime = 0
     private val TAG = "testLifeCL"
     val db = Firebase.firestore
 
@@ -107,12 +108,7 @@ class FragmentPlayRoom : Fragment() {
         roomDocId = roomData.roomId
         setWaitState()
 
-        val serviceIntent = Intent(mContext, PlayerDeleteService::class.java).apply {
-            putExtra("DOC_ID_EXTRA", roomDocId)
-            putExtra("CURRENT_UID_EXTRA", currentUid)
-        }
 
-        activity.startService(serviceIntent)
     }
 
     override fun onCreateView(
@@ -167,6 +163,7 @@ class FragmentPlayRoom : Fragment() {
         }
 
         viewOnClick()
+        setTimerData()
 
         Log.d(TAG, "onCreateView")
         return binding.root
@@ -253,10 +250,9 @@ class FragmentPlayRoom : Fragment() {
 
                             getUserScoreData(playerDataList)
 
-                            try {
-                                endGame()
-                            } catch (_: Exception) {
-                            }
+                            endTurnAnimator?.cancel()
+
+                            try { endGame() } catch (_: Exception) {}
                         }
                     }
                 }
@@ -300,23 +296,6 @@ class FragmentPlayRoom : Fragment() {
                 }
             }
     }
-
-//    private fun onPauseRefreshListener() {
-//        db.collection("room_on_pause").document(roomDocId)
-//            .addSnapshotListener { value, _ ->
-//                if (value != null) {
-//                    val pauseData = value.data
-//                    if(pauseData != null) {
-//                        for((key, user) in pauseData) {
-//                            val userState = user as Boolean
-//                            if(userState) {
-//
-//                            }
-//                        }
-//                    }
-//                }
-//            }
-//    }
 
     @SuppressLint("SetTextI18n")
     private fun scoreBoardNameInit(playerDataList: Map<String, *>) {
@@ -376,15 +355,23 @@ class FragmentPlayRoom : Fragment() {
         binding.imgPlayDice5.setImageResource(diceImage[0])
     }
 
+    @SuppressLint("SetTextI18n")
     private fun setRollBtnControl() {
         if (myTurnState) {
             binding.imgPlayRoomRollDice.isClickable = true
             binding.imgPlayRoomRollDice.isEnabled = true
+
             binding.imgPlayRoomRollDice.startAnimation(fadeIn01)
+
+            endTurnAnimator?.start()
         } else {
             binding.imgPlayRoomRollDice.isClickable = false
             binding.imgPlayRoomRollDice.isEnabled = false
+
             binding.imgPlayRoomRollDice.clearAnimation()
+
+            endTurnAnimator?.cancel()
+            binding.textScoreBoard1EndTime.text = "END TURN 180"
         }
     }
 
@@ -689,9 +676,6 @@ class FragmentPlayRoom : Fragment() {
                 db.collection("room_list").document(roomDocId)
                     .set(map, SetOptions.merge())
             }
-            withContext(Main) {
-
-            }
         }
     }
 
@@ -764,6 +748,18 @@ class FragmentPlayRoom : Fragment() {
             roomScoreBoardDelete(currentUid)
             roomListDelete(currentUid)
             roomTurnDelete(currentUid)
+            db.collection("room_list").document(roomDocId)
+                .get()
+                .addOnSuccessListener {
+                    val data = it.data
+                    if(data != null) {
+                        val castData = data["room_player_list"] as List<String>
+                        if(castData.size == 1) {
+                            db.collection("room_list").document(roomDocId)
+                                .delete()
+                        }
+                    }
+                }
         }
     }
 
@@ -820,14 +816,53 @@ class FragmentPlayRoom : Fragment() {
 
     private fun setTimerData() {
         val executor = Executors.newScheduledThreadPool(1)
-
         executor.scheduleAtFixedRate(
             {
-                val map = mapOf(currentUid to startTime)
-                db.collection("room_user_timestamp").document(roomDocId)
-                    .set(map)
+                lifecycleScope.launch(IO){
+                    startTime++
+                    val map = mapOf(currentUid to startTime)
+                    db.collection("room_user_timestamp").document(roomDocId)
+                        .set(map, SetOptions.merge())
+                        .addOnSuccessListener {
+                            setUserExitCheck()
+                        }
+                }
             }, 0, 60, TimeUnit.SECONDS
         )
+    }
+
+    private fun setUserExitCheck() {
+        db.collection("room_user_timestamp").document(roomDocId)
+            .get()
+            .addOnSuccessListener {
+                val data = it.data
+                if(data != null) {
+                    val standard = data[currentUid] as Long
+                    for((key, value) in data){
+                        val castValue = value as Long
+                        if(castValue + 3 <= standard) {
+                            roomScoreBoardDelete(key)
+                            roomListDelete(key)
+                            roomTurnDelete(key)
+                        }
+                    }
+                }
+            }
+    }
+
+    @SuppressLint("SetTextI18n")
+    private fun endTurnAnimation(): ValueAnimator? {
+        val animator = ValueAnimator.ofInt(180, 0).apply {
+            duration = 180000
+            interpolator = LinearInterpolator()
+            addUpdateListener {
+                binding.textScoreBoard1EndTime.text = "END TURN ${it.animatedValue}"
+                if(it.animatedValue == 0) {
+                    binding.btnPlayTest.performClick()
+                }
+            }
+        }
+        return animator
     }
 
 }

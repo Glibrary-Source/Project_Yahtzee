@@ -92,6 +92,18 @@
             app:layout_constraintTop_toBottomOf="@id/cs_play_room_player"
             app:layout_constraintStart_toStartOf="@id/cs_play_room_board" />
 
+        <TextView
+            android:id="@+id/text_score_board1_end_time"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="18dp"
+            tools:text="End Turn 240:00"
+            android:textColor="@color/timer_red"
+            android:layout_marginTop="8dp"
+            style="@style/MyTextViewStyle"
+            app:layout_constraintTop_toBottomOf="@id/cs_play_room_player"
+            app:layout_constraintEnd_toEndOf="@id/cs_play_room_board" />
+
         <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/cs_play_room_board"
             android:layout_width="match_parent"

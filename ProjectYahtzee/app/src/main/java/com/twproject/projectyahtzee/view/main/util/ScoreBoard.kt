@@ -33,7 +33,6 @@ class ScoreBoard(
     private val bonusScore = mutableListOf<Int>()
     private val bonusList = listOf("ones", "twos", "threes", "fours", "fives", "sixes")
     private var bonusFirst = true
-    private val auth = FirebaseAuth.getInstance()
 
     fun setScoreList(score: List<Int>) {
         scoreList = score

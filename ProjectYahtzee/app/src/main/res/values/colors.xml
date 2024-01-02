@@ -6,4 +6,5 @@
     <color name="colorPrimaryDark">#343A40</color>
     <color name="hintYellow">#ffe223</color>
     <color name="colorListItemBG">#66727e</color>
+    <color name="timer_red">#e5383b</color>
 </resources>
